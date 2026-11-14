@@ -1,0 +1,406 @@
+{
+  "byCategory": [
+    {
+      "category": "complaint",
+      "tp": 4,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.8,
+      "f1": 0.888888888888889
+    },
+    {
+      "category": "duration",
+      "tp": 3,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.75,
+      "recall": 1,
+      "f1": 0.8571428571428571
+    },
+    {
+      "category": "followup",
+      "tp": 4,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.8,
+      "f1": 0.888888888888889
+    },
+    {
+      "category": "allergy",
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "category": "examination",
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "category": "assessment",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "category": "medication",
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    {
+      "category": "other",
+      "tp": 2,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666
+    }
+  ],
+  "mode": "baseline",
+  "model": "Keyword baseline v1",
+  "createdAt": "2026-11-14T08:13:34.720Z",
+  "sampleSize": 8,
+  "precision": 0.8846153846153846,
+  "recall": 0.92,
+  "f1": 0.9019607843137256,
+  "fp": 3,
+  "fn": 2,
+  "unsupportedRate": 0,
+  "evidenceAccuracy": 0.8846153846153846,
+  "validity": 1,
+  "latencyMs": 0.1184221249999986,
+  "examples": [
+    {
+      "id": "e1",
+      "name": "Short symptom",
+      "expected": [
+        "s1:complaint",
+        "s2:duration",
+        "s3:followup"
+      ],
+      "predicted": [
+        "s1:complaint",
+        "s2:duration",
+        "s3:followup"
+      ],
+      "missing": [],
+      "extra": [],
+      "facts": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "flags": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 3,
+      "evidenceTotal": 3,
+      "evidenceCorrect": 3,
+      "latencyMs": 0.4458749999999725
+    },
+    {
+      "id": "e2",
+      "name": "Allergy and exam",
+      "expected": [
+        "s1:allergy",
+        "s2:examination",
+        "s3:assessment"
+      ],
+      "predicted": [
+        "s1:allergy",
+        "s2:examination",
+        "s3:assessment"
+      ],
+      "missing": [],
+      "extra": [],
+      "facts": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "flags": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 3,
+      "evidenceTotal": 3,
+      "evidenceCorrect": 3,
+      "latencyMs": 0.09274999999999523
+    },
+    {
+      "id": "e3",
+      "name": "Ambiguous medication",
+      "expected": [
+        "s1:medication",
+        "s2:complaint",
+        "s3:followup"
+      ],
+      "predicted": [
+        "s1:medication",
+        "s2:complaint",
+        "s3:followup"
+      ],
+      "missing": [],
+      "extra": [],
+      "facts": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "flags": {
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 3,
+      "evidenceTotal": 3,
+      "evidenceCorrect": 3,
+      "latencyMs": 0.15829199999998878
+    },
+    {
+      "id": "e4",
+      "name": "Correction",
+      "expected": [
+        "s2:duration",
+        "s3:complaint"
+      ],
+      "predicted": [
+        "s1:duration",
+        "s2:duration",
+        "s3:complaint"
+      ],
+      "missing": [],
+      "extra": [
+        "s1:duration"
+      ],
+      "facts": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1,
+        "f1": 0.8
+      },
+      "flags": {
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 3,
+      "evidenceTotal": 3,
+      "evidenceCorrect": 2,
+      "latencyMs": 0.04108400000001211
+    },
+    {
+      "id": "e5",
+      "name": "Patient diagnostic guess",
+      "expected": [
+        "s1:other",
+        "s2:assessment",
+        "s3:followup"
+      ],
+      "predicted": [
+        "s1:other",
+        "s2:assessment",
+        "s3:followup"
+      ],
+      "missing": [],
+      "extra": [],
+      "facts": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "flags": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 3,
+      "evidenceTotal": 3,
+      "evidenceCorrect": 3,
+      "latencyMs": 0.03804199999999014
+    },
+    {
+      "id": "e6",
+      "name": "Complete medication statement",
+      "expected": [
+        "s1:medication",
+        "s2:allergy",
+        "s3:examination",
+        "s4:followup"
+      ],
+      "predicted": [
+        "s1:medication",
+        "s2:allergy",
+        "s3:examination",
+        "s4:followup"
+      ],
+      "missing": [],
+      "extra": [],
+      "facts": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "flags": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 4,
+      "evidenceTotal": 4,
+      "evidenceCorrect": 4,
+      "latencyMs": 0.12100000000000932
+    },
+    {
+      "id": "e7",
+      "name": "Informal symptom description",
+      "expected": [
+        "s1:complaint",
+        "s2:duration",
+        "s3:assessment",
+        "s4:followup"
+      ],
+      "predicted": [
+        "s1:other",
+        "s2:duration",
+        "s3:assessment",
+        "s4:other"
+      ],
+      "missing": [
+        "s1:complaint",
+        "s4:followup"
+      ],
+      "extra": [
+        "s1:other",
+        "s4:other"
+      ],
+      "facts": {
+        "tp": 2,
+        "fp": 2,
+        "fn": 2,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "flags": {
+        "tp": 3,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.75,
+        "recall": 1,
+        "f1": 0.8571428571428571
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 4,
+      "evidenceTotal": 4,
+      "evidenceCorrect": 2,
+      "latencyMs": 0.03275000000002137
+    },
+    {
+      "id": "e8",
+      "name": "Unlabeled speakers",
+      "expected": [
+        "s1:complaint",
+        "s2:other",
+        "s3:medication"
+      ],
+      "predicted": [
+        "s1:complaint",
+        "s2:other",
+        "s3:medication"
+      ],
+      "missing": [],
+      "extra": [],
+      "facts": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "flags": {
+        "tp": 6,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "valid": true,
+      "unsupported": 0,
+      "statements": 3,
+      "evidenceTotal": 3,
+      "evidenceCorrect": 3,
+      "latencyMs": 0.017583999999999378
+    }
+  ]
+}

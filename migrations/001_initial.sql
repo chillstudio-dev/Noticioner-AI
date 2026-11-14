@@ -1,0 +1,13 @@
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,name TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS patients(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,name TEXT NOT NULL,dob TEXT NOT NULL,history TEXT NOT NULL,allergies TEXT NOT NULL,medications TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS patients_owner ON patients(user_id);
+CREATE TABLE IF NOT EXISTS consultations(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,patient_id TEXT NOT NULL REFERENCES patients(id),created_at TEXT NOT NULL,updated_at TEXT NOT NULL,type TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'Draft',transcript TEXT NOT NULL DEFAULT '',note TEXT,flags TEXT NOT NULL DEFAULT '[]',provider TEXT,latency_ms REAL,version INTEGER NOT NULL DEFAULT 0,approved_at TEXT,approved_by TEXT);
+CREATE INDEX IF NOT EXISTS consultations_owner ON consultations(user_id,created_at);
+CREATE TABLE IF NOT EXISTS note_versions(id TEXT PRIMARY KEY,consultation_id TEXT NOT NULL REFERENCES consultations(id) ON DELETE CASCADE,version INTEGER NOT NULL,note TEXT NOT NULL,kind TEXT NOT NULL,created_at TEXT NOT NULL,UNIQUE(consultation_id,version));
+CREATE TABLE IF NOT EXISTS audit_events(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,consultation_id TEXT REFERENCES consultations(id) ON DELETE CASCADE,action TEXT NOT NULL,created_at TEXT NOT NULL,actor TEXT NOT NULL,metadata TEXT NOT NULL DEFAULT '{}');
+CREATE INDEX IF NOT EXISTS audit_owner ON audit_events(user_id,created_at);
+CREATE TABLE IF NOT EXISTS evaluation_runs(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,created_at TEXT NOT NULL,results TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS rate_limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,reset_at INTEGER NOT NULL);
+PRAGMA user_version = 1;

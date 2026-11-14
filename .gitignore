@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.env*
+!.env.example
+data/*.sqlite*
+data/models/
+.tools/
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+*.log
+.DS_Store

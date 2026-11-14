@@ -1,0 +1,14 @@
+# Known limitations
+
+1. **Live note generation needs provider credentials.** Native Claude and OpenAI-compatible note adapters exist, but mocked tests do not establish real connectivity or model quality. Audio can use the installed local Whisper engine without an API key, or a separate compatible audio API. Local mode supports English clips up to three minutes, one transcription at a time, with contextual AI speaker inference at note generation. Physical microphone permission and recording behavior still require a manual device check.
+2. Offline generation is a keyword baseline, not AI. It preserves contradictory/obsolete statements and can miscategorize language. The evaluation deliberately exposes these errors.
+3. Exact quotes validate source existence, not semantic support. “Source linked · verify meaning” is intentionally qualified. The system cannot prove that a paraphrase is accurate.
+4. Only transcript evidence feeds generation; existing synthetic record context is displayed for manual review. No automated clinical interaction checking, diagnostic suggestions, prescriptions, multilingual claims or acoustic diarization.
+5. Evaluation uses eight development-visible synthetic examples and author-written annotations. No independent clinical review, held-out validation, audio quality scoring or statistical confidence intervals. It is a reproducible engineering demonstration, not evidence of clinical safety.
+6. SQLite and application-level audit history require a persistent single Node server. Sites/Cloudflare deployment is not implemented. Docker is unverified unless the quality report states otherwise.
+7. Notes can be edited statement by statement, but adding completely new SOAP sections is not exposed in the editor. Correct/add source content and regenerate if needed. Version history is retained and available through an authenticated endpoint, not a full visual diff UI.
+8. Recordings use post-recording uploads, with a 20 MB server limit. No streaming, audio recovery after reload, durable audio storage or incremental transcript. Unsaved transcript changes show a warning when leaving the page; no cross-session local draft autosave.
+9. PDF uses Helvetica with unsupported characters replaced by question marks. English synthetic scenarios are supported; Unicode typography requires embedded licensed fonts before multilingual use.
+10. No certified e-signature, enterprise accounts, real patient data workflow, regulatory claims, clinical validation or institutional deployment readiness.
+11. Optional Stage B features (multilingual, diarization, verified medication risk database, advanced templates, dark mode, shortcuts) are intentionally deferred. Basic analytics are calculated from actual stored data.
+12. No independent accessibility audit or exhaustive browser/device testing. See actual verification in the quality report.

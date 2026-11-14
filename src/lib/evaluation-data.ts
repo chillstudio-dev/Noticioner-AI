@@ -1,0 +1,83 @@
+// Reference annotations authored separately from extraction outputs. Not clinically reviewed.
+export const evaluationCases = [
+  {
+    id: "e1",
+    name: "Short symptom",
+    text: "Patient: I have a cough.\nPatient: It started three days ago.\nDoctor: Follow-up: return in one week.",
+    gold: ["s1:complaint", "s2:duration", "s3:followup"],
+    flags: ["missing-allergy", "missing-medication", "missing-examination"],
+  },
+  {
+    id: "e2",
+    name: "Allergy and exam",
+    text: "Patient: I have an allergy to penicillin.\nDoctor: On examination, temperature is 37 C.\nDoctor: My assessment is not yet established.",
+    gold: ["s1:allergy", "s2:examination", "s3:assessment"],
+    flags: ["missing-medication", "missing-followup"],
+  },
+  {
+    id: "e3",
+    name: "Ambiguous medication",
+    text: "Patient: I take a tablet, maybe 10 mg.\nPatient: I have a headache.\nDoctor: Follow-up: bring the packaging.",
+    gold: ["s1:medication", "s2:complaint", "s3:followup"],
+    flags: [
+      "missing-allergy",
+      "missing-duration",
+      "missing-examination",
+      "medication-details",
+      "uncertainty",
+    ],
+  },
+  {
+    id: "e4",
+    name: "Correction",
+    text: "Patient: It started three days ago.\nPatient: Actually, it started yesterday.\nPatient: I have a sore throat.",
+    gold: ["s2:duration", "s3:complaint"],
+    flags: [
+      "missing-allergy",
+      "missing-medication",
+      "missing-followup",
+      "missing-examination",
+      "uncertainty",
+    ],
+  },
+  {
+    id: "e5",
+    name: "Patient diagnostic guess",
+    text: "Patient: I think my diagnosis is asthma.\nDoctor: No assessment has been established.\nDoctor: Follow-up: arrange further review.",
+    gold: ["s1:other", "s2:assessment", "s3:followup"],
+    flags: [
+      "missing-allergy",
+      "missing-medication",
+      "missing-examination",
+      "uncertainty",
+    ],
+  },
+  {
+    id: "e6",
+    name: "Complete medication statement",
+    text: "Patient: I take fictional medication A 5 mg orally once daily.\nPatient: No known allergies.\nDoctor: Examination deferred.\nDoctor: Follow-up: review in a week.",
+    gold: ["s1:medication", "s2:allergy", "s3:examination", "s4:followup"],
+    flags: [],
+  },
+  {
+    id: "e7",
+    name: "Informal symptom description",
+    text: "Patient: My head is pounding.\nPatient: Since yesterday.\nDoctor: My impression is not established.\nDoctor: Please come back next Tuesday.",
+    gold: ["s1:complaint", "s2:duration", "s3:assessment", "s4:followup"],
+    flags: ["missing-allergy", "missing-medication", "missing-examination"],
+  },
+  {
+    id: "e8",
+    name: "Unlabeled speakers",
+    text: "I feel unwell.\nPerhaps it is a cold.\nTake an unknown tablet.",
+    gold: ["s1:complaint", "s2:other", "s3:medication"],
+    flags: [
+      "missing-allergy",
+      "missing-duration",
+      "missing-followup",
+      "missing-examination",
+      "medication-details",
+      "uncertainty",
+    ],
+  },
+];
