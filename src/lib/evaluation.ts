@@ -128,6 +128,8 @@ export async function evaluate(mode: "baseline" | "ai") {
     ),
   }));
   return {
+    suite: "extraction" as const,
+    suiteVersion: "extraction-1",
     byCategory,
     mode,
     model: mode === "ai" ? providerStatus().model : "Keyword baseline v1",

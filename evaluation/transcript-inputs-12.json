@@ -1,0 +1,286 @@
+{
+  "suite": "noticioner-fidelity-12",
+  "suite_version": "fictional-followup-2",
+  "cases": [
+    {
+      "id": "C01",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I'm here for my usual diabetes follow-up."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I've had dry mouth for two days."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "We'll meet again in three months."
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I haven't felt dizzy this week."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "My appetite has been lower since Monday."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "I have not made an assessment today."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my regular diabetes follow-up."
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "The tingling began four days ago."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "Correction: it began yesterday, not four days ago."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "I still attend my regular diabetes visits."
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I take a small white tablet, maybe five milligrams."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I don't know its name."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "Please bring the package next time."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "This is my usual diabetes follow-up."
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I think my numb toes mean I have nerve damage."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "That has not been assessed in this conversation."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "The numbness comes and goes."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual diabetes follow-up."
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "This is my regular follow-up visit for my ongoing asthma care."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "On examination, the patient's hands are warm."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "I have not noticed a change in my usual routine."
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I have been keeping a note of my questions."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "Let's review those questions together in two weeks."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "I can come back then."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual hypertension follow-up."
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Unknown",
+          "text": "Maybe it was two tablets; I can't remember who changed it."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I am not sure when that happened."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "The medication details remain unclear in this conversation."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "This is a routine follow-up for my ongoing asthma care."
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I feel tired in the afternoon."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "It has been happening for about a week."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "We have not discussed your medication list today."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual follow-up about ongoing diabetes care."
+        }
+      ]
+    },
+    {
+      "id": "C10",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I have an allergy to fictional compound Q; it caused an itchy rash."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I did not have breathing trouble with it."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "I have recorded what you told me."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "This is my routine diabetes follow-up."
+        }
+      ]
+    },
+    {
+      "id": "C11",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I have had less appetite lately."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I don't know exactly when it started."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "I have not recorded an examination finding today."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual diabetes follow-up."
+        }
+      ]
+    },
+    {
+      "id": "C12",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I am here for a continuing-care follow-up."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "The recorded weight today is 62 kilograms."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "The next visit is scheduled in six weeks."
+        }
+      ]
+    }
+  ]
+}

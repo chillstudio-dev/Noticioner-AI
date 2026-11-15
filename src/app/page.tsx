@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { Fragment, useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import {
   Activity,
   ArrowDownToLine,
@@ -16,6 +17,7 @@ import {
   LayoutDashboard,
   Link2,
   Loader2,
+  Menu,
   Play,
   Plus,
   Search,
@@ -30,16 +32,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import {
   parseTranscript,
   sections,
   type Note,
@@ -50,7 +42,20 @@ import { api, loadWorkspace } from "@/lib/client-api";
 import { Badge, Modal } from "@/components/ui";
 import type { providerStatus } from "@/lib/provider";
 import { Recorder } from "@/components/recorder";
+import { TranscriptTranslation } from "@/components/transcript-translation";
+import {
+  ConsultationStatusChart,
+  ExtractionChart,
+} from "@/components/clinical-charts";
+import type {
+  ExtractionChartDatum,
+  StatusChartDatum,
+} from "@/components/clinical-charts";
+import { TrustSources } from "@/components/trust-review";
+import { PatientSummaries } from "@/components/patient-summaries";
+import { TrustQuality } from "@/components/trust-quality";
 import type { Evaluation } from "@/lib/evaluation";
+
 type Page =
   | "Overview"
   | "Consultations"
@@ -96,6 +101,7 @@ export default function App() {
     [message, setMessage] = useState(""),
     [messageKind, setMessageKind] = useState<"info" | "error">("info"),
     [busy, setBusy] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [newOpen, setNewOpen] = useState(false),
     [patientId, setPatientId] = useState(""),
     [consultType, setConsultType] = useState("General consultation");
@@ -197,10 +203,19 @@ export default function App() {
     if (!canLeaveRecord()) return;
     setSelected(null);
     setPage(p);
+    setNavOpen(false);
     setSearch("");
     setFilter("All statuses");
     setMessage("");
   };
+  useEffect(() => {
+    if (!navOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setNavOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [navOpen]);
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (
@@ -273,8 +288,12 @@ export default function App() {
     { name: "Analytics", icon: BarChart3 },
     { name: "Settings", icon: Settings },
   ] as const;
-  const latestBaseline = data.evaluations.find((e) => e.mode === "baseline"),
-    latestAI = data.evaluations.find((e) => e.mode === "ai");
+  const latestBaseline = data.evaluations.find(
+      (e) => (!e.suite || e.suite === "extraction") && e.mode === "baseline",
+    ),
+    latestAI = data.evaluations.find(
+      (e) => (!e.suite || e.suite === "extraction") && e.mode === "ai",
+    );
   const table = (items: Consultation[], isFiltered = false) =>
     items.length ? (
       <div className="table-scroll">
@@ -369,7 +388,10 @@ export default function App() {
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <aside className="sidebar">
+      <aside
+        id="workspace-navigation"
+        className={`sidebar${navOpen ? " is-open" : ""}`}
+      >
         <a
           className="brand"
           href="#"
@@ -381,32 +403,51 @@ export default function App() {
           <span className="brandmark">
             <AudioLines size={23} />
           </span>
-          CliniScribe <b>AI</b>
+          Noticioner <b>AI</b>
         </a>
         <div className="workspace-label">
           <span className="workspace-dot" />
-          Clinical workspace<small>Hackathon project</small>
+          Clinical workspace<small>Research prototype</small>
         </div>
         <div className="nav-label">WORKSPACE</div>
         <nav aria-label="Main navigation">
-          {nav.map(({ name, icon: Icon }) => (
-            <button
-              key={name}
-              aria-label={name}
-              aria-current={page === name ? "page" : undefined}
-              title={name}
-              disabled={busy}
-              className={page === name ? "active" : ""}
-              onClick={() => navigate(name)}
-            >
-              <Icon size={19} />
-              {name}
-              {name === "Consultations" && drafts.length > 0 && (
-                <span className="nav-count">{drafts.length}</span>
+          {nav.map(({ name, icon: Icon }, index) => (
+            <Fragment key={name}>
+              {index === 3 && (
+                <div className="nav-label nav-subgroup-label">
+                  REVIEW &amp; SETTINGS
+                </div>
               )}
-            </button>
+              <button
+                aria-label={name}
+                aria-current={page === name ? "page" : undefined}
+                title={name}
+                disabled={busy}
+                className={page === name ? "active" : ""}
+                onClick={() => navigate(name)}
+              >
+                <Icon size={19} />
+                {name}
+                {name === "Consultations" && drafts.length > 0 && (
+                  <span className="nav-count">{drafts.length}</span>
+                )}
+              </button>
+            </Fragment>
           ))}
         </nav>
+        <Link
+          href="/doctor"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "14px 18px",
+            color: "var(--teal)",
+            fontWeight: 600,
+          }}
+        >
+          <ShieldCheck size={18} /> Doctor login
+        </Link>
         <div className="sidebar-bottom">
           <div className="review-first">
             <ShieldCheck size={23} />
@@ -431,8 +472,26 @@ export default function App() {
           </div>
         </div>
       </aside>
+      {navOpen && (
+        <button
+          className="mobile-nav-backdrop"
+          type="button"
+          aria-label="Dismiss navigation"
+          onClick={() => setNavOpen(false)}
+        />
+      )}
       <div className="main-shell">
         <header className="topbar">
+          <button
+            className="mobile-menu-button"
+            type="button"
+            aria-label={navOpen ? "Close navigation" : "Open navigation"}
+            aria-controls="workspace-navigation"
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen((open) => !open)}
+          >
+            {navOpen ? <X size={19} /> : <Menu size={19} />}
+          </button>
           <div className="breadcrumb">
             Workspace <ChevronRight size={14} />
             <strong>{selected ? "Consultation workspace" : page}</strong>
@@ -453,7 +512,7 @@ export default function App() {
         <div className="prototype">
           <ShieldCheck size={14} />
           <span>
-            Veritas AI hackathon prototype · Synthetic data · Simulated approval
+            Noticioner research prototype · Synthetic data · Simulated approval
           </span>
           <Badge>PROTOTYPE</Badge>
         </div>
@@ -615,6 +674,9 @@ export default function App() {
                           localTranscription={
                             data.provider.transcriptionProvider === "local"
                           }
+                          transcriptionLanguages={
+                            data.provider.transcriptionLanguages
+                          }
                           onError={(error) => {
                             setMessageKind("error");
                             setMessage(error);
@@ -685,6 +747,17 @@ export default function App() {
                       </div>
                     }
                     <div className="source-list">
+                      <TranscriptTranslation
+                        key={selected.id}
+                        text={transcript}
+                        endpoint={`consultations/${selected.id}/translate`}
+                        configured={data.provider.configured}
+                        disabled={busy}
+                        onError={(error) => {
+                          setMessage(error);
+                          setMessageKind("error");
+                        }}
+                      />
                       <div className="eyebrow">SOURCE EVIDENCE</div>
                       {parseTranscript(selected.transcript).map((s) => (
                         <div
@@ -881,6 +954,24 @@ export default function App() {
                                         ? "Source linked · verify meaning"
                                         : s.certainty}
                                     </Badge>
+                                    {selected.flags
+                                      .filter(
+                                        (f) =>
+                                          f.trust?.statementId === s.id &&
+                                          f.trust.kind === "evidence",
+                                      )
+                                      .map((f) => (
+                                        <Badge
+                                          key={f.id}
+                                          kind={
+                                            f.trust!.status === "supported"
+                                              ? "teal"
+                                              : "amber"
+                                          }
+                                        >
+                                          EvidenceGuard: {f.trust!.status}
+                                        </Badge>
+                                      ))}
                                     {s.evidence.map((e) => (
                                       <button
                                         className="evidence"
@@ -942,6 +1033,68 @@ export default function App() {
                             Save note edits
                           </button>
                         )}
+                        {selected.status === "Approved" && (
+                          <PatientSummaries
+                            key={selected.id}
+                            endpoint={`/api/consultations/${selected.id}/patient-summaries`}
+                            sources={[
+                              {
+                                id: selected.id,
+                                version: selected.version,
+                                label: "Approved consultation",
+                              },
+                            ]}
+                            canWrite
+                            canApprove
+                            personal
+                            configured={data.provider.configured}
+                          />
+                        )}
+                        {selected.status !== "Approved" && (
+                          <button
+                            disabled={
+                              busy || editing || !data.provider.configured
+                            }
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  "Send the current draft, cited sources and recorded patient context to the configured provider for a new semantic audit? This resets review dispositions.",
+                                )
+                              )
+                                void act(async () => {
+                                  update(
+                                    await api<Consultation>(
+                                      `consultations/${selected.id}/audit`,
+                                      "POST",
+                                      {
+                                        version: selected.version,
+                                        consent: true,
+                                      },
+                                    ),
+                                  );
+                                  await refresh();
+                                });
+                            }}
+                          >
+                            Retry semantic audit
+                          </button>
+                        )}
+                        <details className="trust-detail">
+                          <summary>
+                            Trust Engine source and checker details
+                          </summary>
+                          {selected.flags
+                            .filter((f) => f.trust)
+                            .map((f) => (
+                              <article key={f.id}>
+                                <strong>
+                                  {f.category} · {f.trust!.status} ·{" "}
+                                  {f.trust!.statementId || f.trust!.target}
+                                </strong>
+                                <TrustSources finding={f.trust!} />
+                              </article>
+                            ))}
+                        </details>
                         <div className="review-section">
                           <h3>
                             <ClipboardCheck size={18} />
@@ -949,7 +1102,9 @@ export default function App() {
                             <span>
                               {
                                 selected.flags.filter(
-                                  (f) => f.resolution === "Open",
+                                  (f) =>
+                                    f.trust?.required !== false &&
+                                    f.resolution === "Open",
                                 ).length
                               }{" "}
                               open
@@ -957,45 +1112,49 @@ export default function App() {
                           </h3>
                           <p className="small">
                             Documentation prompts, not proof of clinical error.
-                            Drug interaction checking is unavailable.
+                            Limited synthetic allergy/medication rules are
+                            available; comprehensive interaction checking is
+                            unavailable.
                           </p>
-                          {selected.flags.map((f) => (
-                            <button
-                              key={f.id}
-                              className={`flag ${f.resolution !== "Open" ? "resolved" : ""}`}
-                              disabled={
-                                busy ||
-                                editing ||
-                                selected.status === "Approved"
-                              }
-                              onClick={() => {
-                                setMessage("");
-                                setFlag(f);
-                                setReviewNote(f.note);
-                                setResolution(
-                                  f.resolution === "Open"
-                                    ? "Addressed"
-                                    : f.resolution,
-                                );
-                              }}
-                            >
-                              <span>
-                                {f.resolution === "Open" ? (
-                                  <AlertCircle size={17} />
-                                ) : (
-                                  <CheckCheck size={17} />
-                                )}
-                              </span>
-                              <div>
-                                <strong>{f.category}</strong>
-                                <p>{f.message}</p>
-                                <small>
-                                  {f.priority} · {f.resolution}
-                                </small>
-                              </div>
-                              <ChevronRight size={14} />
-                            </button>
-                          ))}
+                          {selected.flags
+                            .filter((f) => f.trust?.required !== false)
+                            .map((f) => (
+                              <button
+                                key={f.id}
+                                className={`flag ${f.resolution !== "Open" ? "resolved" : ""}`}
+                                disabled={
+                                  busy ||
+                                  editing ||
+                                  selected.status === "Approved"
+                                }
+                                onClick={() => {
+                                  setMessage("");
+                                  setFlag(f);
+                                  setReviewNote(f.note);
+                                  setResolution(
+                                    f.resolution === "Open"
+                                      ? "Addressed"
+                                      : f.resolution,
+                                  );
+                                }}
+                              >
+                                <span>
+                                  {f.resolution === "Open" ? (
+                                    <AlertCircle size={17} />
+                                  ) : (
+                                    <CheckCheck size={17} />
+                                  )}
+                                </span>
+                                <div>
+                                  <strong>{f.category}</strong>
+                                  <p>{f.message}</p>
+                                  <small>
+                                    {f.priority} · {f.resolution}
+                                  </small>
+                                </div>
+                                <ChevronRight size={14} />
+                              </button>
+                            ))}
                         </div>
                         {selected.status !== "Approved" && (
                           <button
@@ -1374,6 +1533,7 @@ export default function App() {
                 development-visible test set, not clinical validation or an
                 unbiased held-out benchmark.
               </div>
+              <TrustQuality configured={data.provider.configured} />
               <div className="evaluation-grid">
                 {[latestBaseline, latestAI].map((r, i) => (
                   <section className="card metric-card" key={i}>
@@ -1435,37 +1595,21 @@ export default function App() {
                 <section className="card chart-card">
                   <h2>Extraction performance</h2>
                   <div style={{ height: 260 }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={["precision", "recall", "f1"].map((key) => ({
+                    <ExtractionChart
+                      data={
+                        (["precision", "recall", "f1"] as const).map((key) => ({
                           name: key.toUpperCase(),
-                          Baseline: latestBaseline
-                            ? Number(
-                                (latestBaseline[key as "f1"] * 100).toFixed(1),
-                              )
-                            : undefined,
-                          AI: latestAI
-                            ? Number((latestAI[key as "f1"] * 100).toFixed(1))
-                            : undefined,
-                        }))}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" />
-                        <YAxis domain={[0, 100]} unit="%" />
-                        <Tooltip />
-                        <Legend />
-                        <Bar
-                          dataKey="Baseline"
-                          fill="#9abbb5"
-                          radius={[5, 5, 0, 0]}
-                        />
-                        <Bar
-                          dataKey="AI"
-                          fill="#0f766e"
-                          radius={[5, 5, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
+                          ...(latestBaseline && {
+                            Baseline: Number(
+                              (latestBaseline[key] * 100).toFixed(1),
+                            ),
+                          }),
+                          ...(latestAI && {
+                            AI: Number((latestAI[key] * 100).toFixed(1)),
+                          }),
+                        })) as ExtractionChartDatum[]
+                      }
+                    />
                   </div>
                 </section>
               )}
@@ -1594,30 +1738,18 @@ export default function App() {
               <div className="card chart-card">
                 <h2>Consultations by status</h2>
                 <div style={{ height: 300 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={[
-                        "Draft",
-                        "Needs Review",
-                        "Reviewed",
-                        "Approved",
-                      ].map((s) => ({
-                        status: s,
-                        count: data.consultations.filter((c) => c.status === s)
-                          .length,
-                      }))}
-                    >
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                      <XAxis dataKey="status" />
-                      <YAxis allowDecimals={false} />
-                      <Tooltip />
-                      <Bar
-                        dataKey="count"
-                        fill="#0f766e"
-                        radius={[6, 6, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <ConsultationStatusChart
+                    data={
+                      ["Draft", "Needs Review", "Reviewed", "Approved"].map(
+                        (s) => ({
+                          status: s,
+                          count: data.consultations.filter(
+                            (c) => c.status === s,
+                          ).length,
+                        }),
+                      ) as StatusChartDatum[]
+                    }
+                  />
                 </div>
               </div>
               <div className="notice">
@@ -1686,7 +1818,7 @@ CLAUDE_MODEL=claude-sonnet-5-5`}</pre>
                     Research boundaries
                   </h2>
                   <p>
-                    CliniScribe AI is a research prototype. Use synthetic
+                    Noticioner AI is a research prototype. Use synthetic
                     demonstration data only. It is not intended for clinical
                     use.
                   </p>
@@ -1738,7 +1870,7 @@ CLAUDE_MODEL=claude-sonnet-5-5`}</pre>
             </div>
           )}
           <footer>
-            CliniScribe AI <span>Human judgment. Clear documentation.</span>
+            Noticioner AI <span>Human judgment. Clear documentation.</span>
             <span>Research prototype · 2026</span>
           </footer>
         </main>
@@ -1908,7 +2040,9 @@ CLAUDE_MODEL=claude-sonnet-5-5`}</pre>
             disabled={
               busy ||
               !reviewed ||
-              selected.flags.some((f) => f.resolution === "Open")
+              selected.flags.some(
+                (f) => f.trust?.required !== false && f.resolution === "Open",
+              )
             }
             onClick={() =>
               act(async () => {

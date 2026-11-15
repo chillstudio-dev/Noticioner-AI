@@ -4,7 +4,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 process.env.DATABASE_PATH = join(
-  mkdtempSync(join(tmpdir(), "cliniscribe-")),
+  mkdtempSync(join(tmpdir(), "noticioner-")),
   "test.sqlite",
 );
 const db = await import("../src/lib/db");

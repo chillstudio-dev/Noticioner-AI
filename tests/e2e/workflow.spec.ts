@@ -6,6 +6,9 @@ test("complete synthetic workflow, evidence, review, approval, PDF and reopen", 
   await expect(
     page.getByRole("heading", { name: /Your documentation workspace/ }),
   ).toBeVisible();
+  await expect(
+    page.getByText("Noticioner research prototype · Synthetic data · Simulated approval", { exact: true }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Patients", exact: true }).click();
   await page.getByRole("button", { name: "Add synthetic patient" }).click();
   await page.getByLabel("Name", { exact: true }).fill("Alex Bennett");
@@ -119,9 +122,18 @@ test("responsive navigation and evaluation", async ({ page }) => {
     page.getByRole("heading", { name: /Your documentation workspace/ }),
   ).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
+  const menu = page.getByRole("button", { name: "Open navigation" });
+  await expect(menu).toBeVisible();
+  await menu.click();
+  await expect(
+    page.getByRole("banner").getByRole("button", { name: "Close navigation" }),
+  ).toHaveAttribute("aria-expanded", "true");
   await page
     .getByRole("button", { name: "AI Evaluation", exact: true })
     .click();
+  await expect(
+    page.getByRole("button", { name: "Open navigation" }),
+  ).toHaveAttribute("aria-expanded", "false");
   await page.getByRole("button", { name: "Run baseline", exact: true }).click();
   await expect(page.getByText("Measured", { exact: true })).toBeVisible();
   expect(

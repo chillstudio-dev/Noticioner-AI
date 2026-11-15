@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { once } from "node:events";
-const dir = await mkdtemp(join(tmpdir(), "cliniscribe-server-check-"));
+const dir = await mkdtemp(join(tmpdir(), "noticioner-server-check-"));
 const env = {
   ...process.env,
   DATABASE_PATH: join(dir, "test.sqlite"),

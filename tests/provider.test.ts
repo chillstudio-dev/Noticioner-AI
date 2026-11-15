@@ -65,6 +65,33 @@ test("Claude uses native Messages with structured JSON and validates source evid
     );
     assert.equal(providerStatus().label, "Claude");
   }));
+test("cloud transcription forwards language and preserves Unicode", () =>
+  isolated(async () => {
+    process.env.STT_API_KEY = "synthetic-key";
+    const audio = new File(["synthetic"], "sample.mp4", { type: "audio/mp4" });
+    for (const language of [
+      "fr",
+      "zh",
+      "ms",
+      "ja",
+      "ko",
+      "es",
+      "ta",
+      "da",
+    ] as const) {
+      globalThis.fetch = async (_url, options) => {
+        assert.equal((options!.body as FormData).get("language"), language);
+        return Response.json({
+          text: "日本語 · தமிழ் · 한국어 · 中文 · français",
+        });
+      };
+      assert.equal(
+        await transcribe(audio, undefined, language),
+        "日本語 · தமிழ் · 한국어 · 中文 · français",
+      );
+    }
+    await assert.rejects(() => transcribe(audio, undefined, "invalid" as "en"));
+  }));
 test("Claude rejects truncated, refused and invalid outputs", () =>
   isolated(async () => {
     process.env.AI_PROVIDER = "anthropic";

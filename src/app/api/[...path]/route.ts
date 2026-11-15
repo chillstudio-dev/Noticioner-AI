@@ -1,3 +1,14 @@
+import { runTrustAudit } from "@/lib/trust-provider";
+import { evaluateTrust } from "@/lib/trust-evaluation";
+import {
+  combinedFlags,
+  personalSources,
+  patientContextHash,
+} from "@/lib/personal-trust";
+import {
+  personalPatientSummaries,
+  PatientSummaryError,
+} from "@/lib/personal-patient-summaries";
 import { isSameRequestOrigin } from "@/lib/request-origin";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -23,12 +34,12 @@ import {
   baseline,
   noteSchema,
   validateEvidence,
-  flagsFor,
   assertApproval,
 } from "@/lib/clinical";
 import { generateNote, providerStatus, transcribe } from "@/lib/provider";
+import { languageSchema } from "@/lib/languages";
+import { translateTranscript, translationInput } from "@/lib/translation";
 import { evaluate } from "@/lib/evaluation";
-import { exportPDF } from "@/lib/pdf";
 export const runtime = "nodejs";
 const patientBody = z.object({
   name: z.string().trim().min(2).max(100),
@@ -74,6 +85,8 @@ async function handle(
   req: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
+  if (process.env.PRACTICE_ONLY === "true")
+    return response({ error: "The standalone workspace is disabled." }, 404);
   try {
     const { path } = await context.params;
     const route = path.join("/"),
@@ -183,14 +196,29 @@ async function handle(
     }
     if (route === "evaluation/run" && method === "POST") {
       const b = z
-        .object({ mode: z.enum(["baseline", "ai"]) })
+        .object({
+          mode: z.enum(["baseline", "deterministic", "ai"]),
+          suite: z.enum(["extraction", "trust"]).optional(),
+          consent: z.boolean().optional(),
+        })
         .parse(await req.json());
       if (!rateLimit(`eval:${user}`, 3, 60000))
         throw new HttpError(
           429,
           "Please wait before running another evaluation.",
         );
-      const result = await evaluate(b.mode);
+      if (b.suite === "trust" && b.mode === "ai" && !b.consent)
+        throw new HttpError(
+          400,
+          "Consent is required for provider-backed synthetic evaluation.",
+        );
+      const result =
+        b.suite === "trust"
+          ? await evaluateTrust(
+              b.mode === "ai" ? "ai" : "deterministic",
+              req.signal,
+            )
+          : await evaluate(b.mode === "ai" ? "ai" : "baseline");
       database()
         .prepare("INSERT INTO evaluation_runs VALUES(?,?,?,?)")
         .run(randomUUID(), user, now(), JSON.stringify(result));
@@ -219,7 +247,8 @@ async function handle(
         ].includes(file.type.split(";")[0])
       )
         throw new HttpError(400, "Unsupported audio type.");
-      const text = await transcribe(file, req.signal);
+      const language = languageSchema.parse(form.get("language") ?? "en");
+      const text = await transcribe(file, req.signal, language);
       audit(user, id, "Transcript generated");
       return response({ text });
     }
@@ -227,6 +256,31 @@ async function handle(
       const c = consultation(user, path[1]);
       if (!c) throw new HttpError(404, "Consultation not found.");
       const action = path[2];
+      if (action === "patient-summaries") {
+        const result = await personalPatientSummaries(
+          user,
+          c.id,
+          method,
+          path[3],
+          path[4],
+          method === "GET" ? undefined : await req.json(),
+          req.signal,
+        );
+        return response(result);
+      }
+      if (method === "POST" && action === "translate" && path.length === 3) {
+        const input = translationInput.parse(await req.json());
+        audit(user, c.id, "Translation sources disclosed");
+        const draft = await translateTranscript(input, req.signal);
+        const latest = consultation(user, c.id);
+        if (!latest || latest.version !== c.version)
+          throw new HttpError(
+            409,
+            "The consultation changed during translation. Reopen and retry.",
+          );
+        audit(user, c.id, "Translation draft generated");
+        return response(draft);
+      }
       if (method === "GET" && action === "audit")
         return response(
           database()
@@ -244,12 +298,13 @@ async function handle(
             .all(c.id),
         );
       if (method === "GET" && action === "pdf") {
+        const { exportPDF } = await import("@/lib/pdf");
         const bytes = await exportPDF(c, patient(user, c.patient_id)!);
         audit(user, c.id, "Document exported", { version: c.version });
         return new NextResponse(Buffer.from(bytes), {
           headers: {
             "Content-Type": "application/pdf",
-            "Content-Disposition": `attachment; filename="CliniScribe-${c.id.slice(0, 8)}.pdf"`,
+            "Content-Disposition": `attachment; filename="Noticioner-${c.id.slice(0, 8)}.pdf"`,
             "Cache-Control": "no-store",
           },
         });
@@ -294,7 +349,7 @@ async function handle(
           const current = editableRecord(user, c.id, b.version);
           database()
             .prepare(
-              "UPDATE consultations SET transcript=?,note=NULL,flags='[]',status='Draft',version=version+1,updated_at=? WHERE id=?",
+              "UPDATE consultations SET transcript=?,note=NULL,flags='[]',trust_context_hash=NULL,status='Draft',version=version+1,updated_at=? WHERE id=?",
             )
             .run(b.transcript, now(), c.id);
           audit(user, c.id, "Transcript edited", {
@@ -310,15 +365,30 @@ async function handle(
         const segments = parseTranscript(c.transcript);
         if (!segments.length)
           throw new HttpError(400, "Enter and save a transcript first.");
+        const contextPatient = patient(user, c.patient_id)!;
+        const contextHash = patientContextHash(contextPatient);
         const start = Date.now(),
           note =
-            b.mode === "ai" ? await generateNote(segments) : baseline(segments);
+            b.mode === "ai"
+              ? await generateNote(segments, req.signal)
+              : baseline(segments);
+        const trust = await runTrustAudit(
+          {
+            note,
+            sources: personalSources(segments, contextPatient, c.version),
+            includeGaps: true,
+          },
+          b.mode === "ai",
+          req.signal,
+        );
+        req.signal.throwIfAborted();
         transaction(() => {
           const current = consultation(user, c.id);
           if (
             !current ||
             current.version !== c.version ||
-            current.status === "Approved"
+            current.status === "Approved" ||
+            patientContextHash(patient(user, c.patient_id)!) !== contextHash
           )
             throw new HttpError(
               409,
@@ -328,13 +398,16 @@ async function handle(
             user,
             c,
             note,
-            flagsFor(note, segments),
+            combinedFlags(note, segments, trust),
             "Draft generated",
             b.mode === "ai"
               ? `AI / ${providerStatus().label} / ${providerStatus().model}`
               : "Offline / keyword baseline",
             Date.now() - start,
           );
+          database()
+            .prepare("UPDATE consultations SET trust_context_hash=? WHERE id=?")
+            .run(contextHash, c.id);
         });
         return response(consultation(user, c.id));
       }
@@ -342,26 +415,82 @@ async function handle(
         const b = z
           .object({ note: noteSchema, version: z.number().int() })
           .parse(await req.json());
+        const current = editableRecord(user, c.id, b.version);
+        if (!current.note)
+          throw new HttpError(409, "Generate a draft before editing.");
+        const contextPatient = patient(user, c.patient_id)!;
+        const contextHash = patientContextHash(contextPatient);
+        const segments = parseTranscript(current.transcript);
+        const note = validateEvidence(b.note, segments);
+        for (const statement of note.statements)
+          if (
+            current.note.statements.find((old) => old.id === statement.id)
+              ?.text !== statement.text
+          )
+            statement.certainty = "Uncertain";
+        const trust = await runTrustAudit(
+          {
+            note,
+            sources: personalSources(segments, contextPatient, current.version),
+            includeGaps: true,
+          },
+          false,
+          req.signal,
+        );
+        req.signal.throwIfAborted();
         transaction(() => {
-          const current = editableRecord(user, c.id, b.version);
-          if (!current.note)
-            throw new HttpError(409, "Generate a draft before editing.");
-          const segments = parseTranscript(current.transcript);
-          const note = validateEvidence(b.note, segments);
-          for (const statement of note.statements) {
-            if (
-              current.note.statements.find((old) => old.id === statement.id)
-                ?.text !== statement.text
-            )
-              statement.certainty = "Uncertain";
-          }
+          const latest = editableRecord(user, c.id, b.version);
+          if (patientContextHash(patient(user, c.patient_id)!) !== contextHash)
+            throw new HttpError(
+              409,
+              "Patient context changed. Retry the audit.",
+            );
           saveVersion(
             user,
-            current,
+            latest,
             note,
-            flagsFor(note, segments),
+            combinedFlags(note, segments, trust),
             "Note edited",
           );
+          database()
+            .prepare("UPDATE consultations SET trust_context_hash=? WHERE id=?")
+            .run(contextHash, c.id);
+        });
+        return response(consultation(user, c.id));
+      }
+      if (method === "POST" && action === "audit") {
+        const b = z
+          .object({ version: z.number().int(), consent: z.literal(true) })
+          .parse(await req.json());
+        const current = editableRecord(user, c.id, b.version);
+        if (!current.note) throw new HttpError(409, "Generate a draft first.");
+        const p = patient(user, current.patient_id)!;
+        const hash = patientContextHash(p);
+        const segments = parseTranscript(current.transcript);
+        const trust = await runTrustAudit(
+          {
+            note: current.note,
+            sources: personalSources(segments, p, current.version),
+            includeGaps: true,
+          },
+          true,
+          req.signal,
+        );
+        req.signal.throwIfAborted();
+        transaction(() => {
+          const latest = editableRecord(user, c.id, b.version);
+          if (patientContextHash(patient(user, current.patient_id)!) !== hash)
+            throw new HttpError(409, "Patient context changed. Retry.");
+          saveVersion(
+            user,
+            latest,
+            current.note!,
+            combinedFlags(current.note!, segments, trust),
+            "Trust audit retried",
+          );
+          database()
+            .prepare("UPDATE consultations SET trust_context_hash=? WHERE id=?")
+            .run(hash, c.id);
         });
         return response(consultation(user, c.id));
       }
@@ -380,16 +509,31 @@ async function handle(
             throw new HttpError(404, "Flag not found.");
           const flags = current.flags.map((f) =>
             f.id === b.id
-              ? { ...f, resolution: b.resolution, note: b.note }
+              ? {
+                  ...f,
+                  resolution: b.resolution,
+                  note: b.note,
+                  ...(f.trust
+                    ? {
+                        trust: {
+                          ...f.trust,
+                          resolution: b.resolution,
+                          note: b.note,
+                        },
+                      }
+                    : {}),
+                }
               : f,
           );
           database()
             .prepare(
-              "UPDATE consultations SET flags=?,status=?,updated_at=? WHERE id=?",
+              "UPDATE consultations SET flags=?,status=?,updated_at=?,version=version+1 WHERE id=?",
             )
             .run(
               JSON.stringify(flags),
-              flags.some((f) => f.resolution === "Open")
+              flags.some(
+                (f) => f.trust?.required !== false && f.resolution === "Open",
+              )
                 ? "Needs Review"
                 : "Reviewed",
               now(),
@@ -412,6 +556,17 @@ async function handle(
           .parse(await req.json());
         transaction(() => {
           const current = editableRecord(user, c.id, b.version);
+          const contextHash = database()
+            .prepare("SELECT trust_context_hash FROM consultations WHERE id=?")
+            .get(c.id)?.trust_context_hash;
+          if (
+            contextHash &&
+            contextHash !== patientContextHash(patient(user, c.patient_id)!)
+          )
+            throw new HttpError(
+              409,
+              "Patient context changed. Edit and save the draft to rerun checks before approval.",
+            );
           assertApproval(current.note, current.flags, b.confirmed, b.reviewed);
           database()
             .prepare(
@@ -438,6 +593,8 @@ async function handle(
         },
         400,
       );
+    if (e instanceof PatientSummaryError)
+      return response({ error: e.message }, e.status);
     if (e instanceof HttpError) return response({ error: e.message }, e.status);
     if (
       e instanceof Error &&

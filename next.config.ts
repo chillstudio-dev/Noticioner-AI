@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
-  serverExternalPackages: ["node:sqlite"],
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
+  serverExternalPackages: ["node:sqlite", "pdfkit"],
+  outputFileTracingIncludes: { "/api/**/*": ["./assets/fonts/**/*", "./migrations/**/*.sql"] },
+  async redirects() {
+    return process.env.PRACTICE_ONLY === "true"
+      ? [{ source: "/", destination: "/practice", permanent: false }]
+      : [];
+  },
   async headers() {
     return [
       {

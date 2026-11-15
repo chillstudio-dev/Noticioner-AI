@@ -17,10 +17,11 @@ async function fixture(
     seconds?: number;
     fail?: boolean;
     delay?: boolean;
+    language?: string;
   },
   run: () => Promise<void>,
 ) {
-  const root = await mkdtemp(join(tmpdir(), "cliniscribe-stt-test-"));
+  const root = await mkdtemp(join(tmpdir(), "noticioner-stt-test-"));
   const env = {
     TMPDIR: root,
     LOCAL_WHISPER_MODEL: join(root, "model.bin"),
@@ -36,7 +37,7 @@ async function fixture(
     await writeFile(env.LOCAL_WHISPER_MODEL, "model fixture");
     await writeFile(
       env.FFMPEG_BIN,
-      `#!/usr/bin/env node
+      `#!${process.execPath}
 const fs = require('node:fs');
 if (process.env.ANTHROPIC_API_KEY) process.exit(77);
 if (${!!options.fail}) { console.error('internal diagnostic must not reach user'); process.exit(1); }
@@ -54,9 +55,10 @@ fs.writeFileSync(process.argv.at(-1), wav);
     );
     await writeFile(
       env.LOCAL_WHISPER_BIN,
-      `#!/usr/bin/env node
+      `#!${process.execPath}
 const fs = require('node:fs');
 if (process.env.ANTHROPIC_API_KEY) process.exit(77);
+if (process.argv[process.argv.indexOf('-l') + 1] !== ${JSON.stringify(options.language || "en")}) process.exit(78);
 const output = process.argv[process.argv.indexOf('-of') + 1];
 setTimeout(() => fs.writeFileSync(output + '.txt', ' A synthetic headache transcript. '), ${options.delay ? 5000 : 0});
 `,
@@ -65,7 +67,7 @@ setTimeout(() => fs.writeFileSync(output + '.txt', ' A synthetic headache transc
     await run();
     assert.deepEqual(
       (await readdir(root)).filter((name) =>
-        name.startsWith("cliniscribe-audio-"),
+        name.startsWith("noticioner-audio-"),
       ),
       [],
     );
@@ -91,6 +93,34 @@ test("local transcription reports missing setup without attempting conversion", 
     process.env.LOCAL_WHISPER_MODEL += ".missing";
     assert.equal(localTranscriptionStatus().configured, false);
     await assert.rejects(() => transcribeLocally(audio), /not ready/);
+  }));
+test("local transcription forwards every supported speech language", async () => {
+  for (const language of [
+    "fr",
+    "zh",
+    "ms",
+    "ja",
+    "ko",
+    "es",
+    "ta",
+    "da",
+  ] as const)
+    await fixture({ language }, async () => {
+      assert.equal(
+        await transcribeLocally(audio, undefined, language),
+        "A synthetic headache transcript.",
+      );
+    });
+});
+test("English-only local models reject non-English transcription", () =>
+  fixture({}, async () => {
+    process.env.LOCAL_WHISPER_MODEL += ".en.bin";
+    await writeFile(process.env.LOCAL_WHISPER_MODEL!, "English-only fixture");
+    assert.deepEqual(localTranscriptionStatus().languages, ["en"]);
+    await assert.rejects(
+      () => transcribeLocally(audio, undefined, "fr"),
+      /only supports English/,
+    );
   }));
 test("decode errors are actionable and temporary audio is removed", () =>
   fixture({ fail: true }, async () => {

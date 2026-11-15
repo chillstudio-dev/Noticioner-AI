@@ -1,0 +1,338 @@
+{
+  "suite": "noticioner-fidelity-12",
+  "suiteVersion": "fictional-followup-2",
+  "mode": "frozen-local-keyword-baseline-v1",
+  "createdAt": "2026-11-15T19:22:06.548Z",
+  "matchingRule": "Exact (case, cited transcript segment, extraction category) pairs; this does not assess semantic paraphrase quality or clinical correctness.",
+  "overall": {
+    "tp": 15,
+    "fp": 29,
+    "fn": 32,
+    "precision": 0.3409090909090909,
+    "recall": 0.3191489361702128,
+    "f1": 0.32967032967032966
+  },
+  "totals": {
+    "supportedFacts": 47,
+    "capturedSupportedFacts": 15,
+    "omissions": 32,
+    "incorrectCategoryAssignments": 29,
+    "literalUnsupportedStatements": 0,
+    "inventedForbiddenDetails": 0,
+    "sourceLinks": 44,
+    "sourceLinkErrors": 0,
+    "speakerErrors": 0,
+    "overconfidentUncertainFacts": 0,
+    "negationSegments": 11,
+    "negationLosses": 0,
+    "numericSegments": 8,
+    "numericLosses": 0,
+    "numericSupersededSegments": 1,
+    "correctionStatements": 1,
+    "staleCorrectionFacts": 1,
+    "soapPlacements": 15,
+    "soapPlacementErrors": 2
+  },
+  "cases": [
+    {
+      "id": "C01",
+      "expectedFacts": 4,
+      "predictedFacts": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 3,
+      "sourceLinks": 3,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S01:history",
+        "S02:complaint",
+        "S03:followup"
+      ],
+      "extra": [
+        "S01:other",
+        "S03:duration"
+      ]
+    },
+    {
+      "id": "C02",
+      "expectedFacts": 6,
+      "predictedFacts": 4,
+      "tp": 2,
+      "fp": 2,
+      "fn": 4,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S01:complaint",
+        "S01:duration",
+        "S02:complaint",
+        "S04:history"
+      ],
+      "extra": [
+        "S01:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C03",
+      "expectedFacts": 2,
+      "predictedFacts": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "sourceLinks": 3,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S03:history"
+      ],
+      "extra": [
+        "S01:duration",
+        "S03:other"
+      ]
+    },
+    {
+      "id": "C04",
+      "expectedFacts": 4,
+      "predictedFacts": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 3,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S02:medication",
+        "S03:followup",
+        "S04:history"
+      ],
+      "extra": [
+        "S02:other",
+        "S03:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C05",
+      "expectedFacts": 5,
+      "predictedFacts": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 4,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S01:complaint",
+        "S02:assessment",
+        "S03:complaint",
+        "S04:history"
+      ],
+      "extra": [
+        "S02:other",
+        "S03:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C06",
+      "expectedFacts": 3,
+      "predictedFacts": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 2,
+      "sourceLinks": 3,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S01:history",
+        "S03:history"
+      ],
+      "extra": [
+        "S01:other",
+        "S03:other"
+      ]
+    },
+    {
+      "id": "C07",
+      "expectedFacts": 4,
+      "predictedFacts": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 3,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S02:followup",
+        "S03:followup",
+        "S04:history"
+      ],
+      "extra": [
+        "S02:duration",
+        "S03:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C08",
+      "expectedFacts": 4,
+      "predictedFacts": 4,
+      "tp": 2,
+      "fp": 2,
+      "fn": 2,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [
+        {
+          "sourceId": "S03",
+          "category": "medication",
+          "section": "Subjective",
+          "expected": [
+            "Assessment"
+          ]
+        }
+      ],
+      "missing": [
+        "S02:duration",
+        "S04:history"
+      ],
+      "extra": [
+        "S02:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C09",
+      "expectedFacts": 4,
+      "predictedFacts": 4,
+      "tp": 2,
+      "fp": 2,
+      "fn": 2,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [
+        {
+          "sourceId": "S03",
+          "category": "medication",
+          "section": "Subjective",
+          "expected": [
+            "Assessment"
+          ]
+        }
+      ],
+      "missing": [
+        "S02:duration",
+        "S04:history"
+      ],
+      "extra": [
+        "S02:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C10",
+      "expectedFacts": 4,
+      "predictedFacts": 4,
+      "tp": 2,
+      "fp": 2,
+      "fn": 2,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S02:complaint",
+        "S04:history"
+      ],
+      "extra": [
+        "S02:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C11",
+      "expectedFacts": 4,
+      "predictedFacts": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 3,
+      "sourceLinks": 4,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S01:complaint",
+        "S02:duration",
+        "S04:history"
+      ],
+      "extra": [
+        "S01:other",
+        "S02:other",
+        "S04:other"
+      ]
+    },
+    {
+      "id": "C12",
+      "expectedFacts": 3,
+      "predictedFacts": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 3,
+      "sourceLinks": 3,
+      "sourceLinkErrors": 0,
+      "speakerErrors": 0,
+      "unsupportedAdditions": 0,
+      "forbiddenMentions": 0,
+      "soapPlacementErrors": [],
+      "missing": [
+        "S01:history",
+        "S02:examination",
+        "S03:followup"
+      ],
+      "extra": [
+        "S01:other",
+        "S02:other",
+        "S03:duration"
+      ]
+    }
+  ],
+  "limits": [
+    "Author-written fictional set; not independently or clinically reviewed.",
+    "Local keyword baseline copies transcript segments and scores segment/category matching only.",
+    "A literal source quote is evidence of text existence, not semantic support."
+  ]
+}

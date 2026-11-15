@@ -1,230 +1,268 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import PDFDocument from "pdfkit";
+import { join } from "node:path";
 import type { Consultation, Patient } from "./db";
 import { sections } from "./clinical";
 
-/** English demonstration export. Every page retains a prototype disclosure. */
-export async function exportPDF(c: Consultation, p: Patient) {
-  const doc = await PDFDocument.create();
-  const regular = await doc.embedFont(StandardFonts.Helvetica);
-  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const teal = rgb(0.06, 0.4, 0.34);
-  const ink = rgb(0.12, 0.23, 0.2);
-  const muted = rgb(0.36, 0.44, 0.4);
-  const border = rgb(0.86, 0.9, 0.87);
-  const paper = rgb(0.96, 0.98, 0.96);
-  const left = 48,
-    width = 499;
-  let page = doc.addPage([595, 842]),
-    y = 790;
-  const safe = (s: string) => s.replace(/[^\x20-\x7E\n]/g, "?");
-  function newPage() {
-    page = doc.addPage([595, 842]);
-    page.drawText("CLINISCRIBE AI / CONTINUED", {
-      x: left,
-      y: 798,
-      size: 9,
-      font: bold,
-      color: teal,
-    });
-    page.drawText("SYNTHETIC DEMONSTRATION - NOT FOR CLINICAL USE", {
-      x: left,
-      y: 782,
-      size: 8,
-      font: regular,
-      color: muted,
-    });
-    page.drawLine({
-      start: { x: left, y: 770 },
-      end: { x: left + width, y: 770 },
-      thickness: 0.6,
-      color: border,
-    });
-    y = 748;
-  }
-  function room(height: number) {
-    if (y - height < 64) newPage();
-  }
-  function text(value: string, size = 10, strong = false, color = ink) {
-    const font = strong ? bold : regular;
-    // Break exceptionally long tokens as well as ordinary word boundaries.
-    const words = safe(value)
-      .split(/\s+/)
-      .flatMap((word) => {
-        const parts: string[] = [];
-        let part = "";
-        for (const character of word) {
-          if (font.widthOfTextAtSize(part + character, size) > width) {
-            parts.push(part);
-            part = "";
-          }
-          part += character;
-        }
-        if (part) parts.push(part);
-        return parts;
-      });
-    let row = "";
-    function draw() {
-      room(size + 5);
-      page.drawText(row, { x: left, y, size, font, color });
-      y -= size + 5;
-    }
-    for (const word of words) {
-      if (row && font.widthOfTextAtSize(row + " " + word, size) > width) {
-        draw();
-        row = "";
-      }
-      row += (row ? " " : "") + word;
-    }
-    if (row) draw();
-  }
-  function heading(title: string, letter?: string) {
-    room(65);
-    y -= 8;
-    page.drawLine({
-      start: { x: left, y: y + 8 },
-      end: { x: left + width, y: y + 8 },
-      thickness: 0.6,
-      color: border,
-    });
-    if (letter) {
-      page.drawRectangle({
-        x: left,
-        y: y - 13,
-        width: 22,
-        height: 22,
-        color: paper,
-      });
-      page.drawText(letter, {
-        x: left + 7,
-        y: y - 6,
-        size: 11,
-        font: bold,
-        color: teal,
-      });
-    }
-    page.drawText(title, {
-      x: left + (letter ? 33 : 0),
-      y: y - 5,
-      size: 11,
-      font: bold,
-      color: teal,
-    });
-    y -= 30;
-  }
-  doc.setTitle(`CliniScribe AI - Synthetic consultation - ${p.name}`);
-  doc.setAuthor("CliniScribe AI research prototype");
-  doc.setSubject("Synthetic demonstration document. Not medical advice.");
-  page.drawRectangle({ x: 0, y: 833, width: 595, height: 9, color: teal });
-  text("CliniScribe AI", 25, true, teal);
-  text("CLINICAL DOCUMENTATION / RESEARCH PROTOTYPE", 8, true, muted);
-  y -= 12;
-  page.drawRectangle({
-    x: left - 12,
-    y: y - 29,
-    width: width + 24,
-    height: 43,
-    color: paper,
+const fonts = join(process.cwd(), "assets", "fonts");
+const margin = 48;
+const colors = {
+  ink: "#183A37",
+  muted: "#586D66",
+  teal: "#126E61",
+  line: "#DCE6E0",
+  pale: "#F0F6F2",
+};
+
+/** Embedded fonts, shaped script runs and flowing paragraphs preserve source text. */
+export async function exportPDF(
+  c: Consultation,
+  p: Patient,
+): Promise<Uint8Array> {
+  const doc = new PDFDocument({
+    size: "A4",
+    bufferPages: true,
+    margins: { top: 68, right: margin, bottom: 68, left: margin },
+    info: {
+      Title: `Noticioner AI - Synthetic consultation - ${p.name}`,
+      Author: "Noticioner AI research prototype",
+      Subject: "Synthetic demonstration document. Not for clinical use.",
+    },
   });
-  text("SYNTHETIC DEMONSTRATION DOCUMENT", 9, true, teal);
-  text(
-    "Not for clinical use. Not a prescription or a legally valid medical signature.",
+  const chunks: Buffer[] = [];
+  const output = new Promise<Uint8Array>((resolve, reject) => {
+    doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+    doc.on("end", () => resolve(Buffer.concat(chunks)));
+    doc.on("error", reject);
+  });
+  doc.registerFont("Body", join(fonts, "NotoSans-Regular.ttf"));
+  doc.registerFont("Bold", join(fonts, "NotoSans-Bold.ttf"));
+  doc.registerFont("Tamil", join(fonts, "NotoSansTamil-Regular.ttf"));
+  doc.registerFont("CJK", join(fonts, "NotoSansCJKjp-Regular.otf"));
+  const width = doc.page.width - margin * 2;
+  const bodyBottom = doc.page.height - 68;
+  let first = true;
+  let activeFont = "Body",
+    activeSize = 10,
+    activeColor = colors.ink;
+  function decorate() {
+    const y = doc.y;
+    doc.save();
+    doc.rect(0, 0, doc.page.width, 6).fill(colors.teal);
+    doc
+      .font("Bold")
+      .fontSize(8)
+      .fillColor(colors.teal)
+      .text("NOTICIONER AI / CLINICAL DOCUMENTATION", margin, 25, {
+        lineBreak: false,
+      });
+    doc
+      .font("Body")
+      .fontSize(7.5)
+      .fillColor(colors.muted)
+      .text("SYNTHETIC DEMONSTRATION - NOT FOR CLINICAL USE", margin, 40, {
+        lineBreak: false,
+      });
+    doc
+      .moveTo(margin, 55)
+      .lineTo(doc.page.width - margin, 55)
+      .lineWidth(0.5)
+      .stroke(colors.line);
+    doc.restore();
+    doc.font(activeFont).fontSize(activeSize).fillColor(activeColor);
+    doc.x = margin;
+    doc.y = first ? 76 : Math.max(y, 68);
+    first = false;
+  }
+  decorate();
+  doc.on("pageAdded", decorate);
+  function ensure(height: number) {
+    if (doc.y + height > bodyBottom) doc.addPage();
+  }
+  function fontFor(cluster: string, strong: boolean) {
+    if (/[\u0B80-\u0BFF]/u.test(cluster)) return "Tamil";
+    if (
+      /[\u1100-\u11FF\u2E80-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]/u.test(
+        cluster,
+      )
+    )
+      return "CJK";
+    return strong ? "Bold" : "Body";
+  }
+  const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+  function paragraph(
+    value: string,
+    size = 10,
+    strong = false,
+    color = colors.ink,
+  ) {
+    const clean = value
+      .replace(/\r\n?/g, "\n")
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+    if (!clean) return;
+    for (const line of clean.split("\n")) {
+      if (!line) {
+        ensure(size + 3);
+        doc.y += size + 3;
+        continue;
+      }
+      const runs: { font: string; text: string }[] = [];
+      for (const { segment } of segmenter.segment(line)) {
+        const font = fontFor(segment, strong);
+        const last = runs.at(-1);
+        if (last?.font === font) last.text += segment;
+        else runs.push({ font, text: segment });
+      }
+      doc.x = margin;
+      runs.forEach((run, index) => {
+        activeFont = run.font;
+        activeSize = size;
+        activeColor = color;
+        doc
+          .font(run.font)
+          .fontSize(size)
+          .fillColor(color)
+          .text(run.text, {
+            width,
+            lineGap: 3,
+            paragraphGap: 3,
+            continued: index < runs.length - 1,
+          });
+      });
+    }
+  }
+  function heading(title: string) {
+    ensure(72);
+    doc.y += 12;
+    doc
+      .moveTo(margin, doc.y)
+      .lineTo(margin + width, doc.y)
+      .lineWidth(0.6)
+      .stroke(colors.line);
+    doc.y += 10;
+    paragraph(title, 12, true, colors.teal);
+    doc.y += 5;
+  }
+  paragraph("Consultation report", 24, true, colors.teal);
+  paragraph(
+    "Research prototype - not a prescription or a legally valid medical signature.",
     8,
     false,
-    muted,
+    colors.muted,
   );
-  y -= 15;
-  text(p.name, 16, true);
-  text(`Synthetic patient  /  Date of birth: ${p.dob}`, 9, false, muted);
-  y -= 7;
-  text(`Consultation: ${c.created_at.slice(0, 10)}  |  ${c.type}`, 10);
-  text(`Status: ${c.status}  |  Document version: ${c.version}`, 10, true);
-  text(`Generation: ${c.provider || "No draft generated"}`, 9, false, muted);
-  text(`Record ID: ${c.id}`, 8, false, muted);
-  y -= 8;
+  doc.y += 14;
+  paragraph(p.name, 17, true);
+  paragraph(`Date of birth: ${p.dob}`, 9, false, colors.muted);
+  paragraph(`Consultation date: ${c.created_at.slice(0, 10)}`, 9);
+  paragraph(`Consultation type: ${c.type}`, 9);
+  paragraph(
+    `Status: ${c.status}   |   Document version: ${c.version}`,
+    9,
+    true,
+  );
+  paragraph(
+    `Generation: ${c.provider || "No draft generated"}`,
+    8,
+    false,
+    colors.muted,
+  );
+  paragraph(`Record ID: ${c.id}`, 8, false, colors.muted);
   for (const section of sections) {
-    heading(section, section[0]);
+    heading(section);
     const statements =
-      c.note?.statements.filter((s) => s.section === section) || [];
+      c.note?.statements.filter((statement) => statement.section === section) ||
+      [];
     if (!statements.length)
-      text(
+      paragraph(
         section === "Assessment"
           ? "Assessment not established in the source conversation - clinician review required."
           : "Not documented in the source conversation.",
         10,
         false,
-        muted,
+        colors.muted,
       );
     for (const statement of statements) {
-      room(40);
-      text(statement.text);
+      // Keep ordinary statements with their provenance; long paragraphs flow across pages.
+      const estimated = doc
+        .font("Body")
+        .fontSize(10)
+        .heightOfString(statement.text, { width, lineGap: 3 });
+      ensure(Math.min(estimated + 42, 120));
+      paragraph(statement.text);
       if (statement.speaker)
-        text(
+        paragraph(
           `Speaker: ${statement.speaker} / ${statement.speakerBasis || "Unknown"}`,
           8,
           false,
-          muted,
+          colors.muted,
         );
-      text(
-        `Source: ${statement.evidence.map((e) => e.segmentId).join(", ") || "No validated evidence"}  /  ${statement.certainty === "Supported" ? "Source linked - verify meaning" : statement.certainty}`,
+      paragraph(
+        `Source: ${statement.evidence.map((evidence) => evidence.segmentId).join(", ") || "No validated evidence"} / ${statement.certainty === "Supported" ? "Source linked - verify meaning" : statement.certainty}`,
         8,
         false,
-        muted,
+        colors.muted,
       );
-      y -= 5;
+      doc.y += 8;
     }
   }
   heading("Review & approval");
   if (!c.flags.length)
-    text(
+    paragraph(
       "No rule-based documentation prompts were generated. This does not establish clinical safety.",
       9,
       false,
-      muted,
+      colors.muted,
     );
   for (const flag of c.flags) {
-    room(40);
-    text(`${flag.resolution} / ${flag.category}`, 9, true);
-    text(flag.message, 9, false, muted);
-    if (flag.note) text(`Reviewer note: ${flag.note}`, 9, false, muted);
-    y -= 5;
+    ensure(64);
+    paragraph(`${flag.resolution} / ${flag.category}`, 9, true);
+    paragraph(flag.message, 9, false, colors.muted);
+    if (flag.note)
+      paragraph(`Reviewer note: ${flag.note}`, 9, false, colors.muted);
+    doc.y += 6;
   }
-  room(50);
-  text(`Simulated approval: ${c.approved_by || "Not approved"}`, 9, true);
+  ensure(65);
+  doc.y += 8;
+  paragraph(`Simulated approval: ${c.approved_by || "Not approved"}`, 9, true);
   if (c.approved_at)
-    text(
-      `Approved at ${c.approved_at}  /  Version ${c.version}`,
+    paragraph(
+      `Approved at ${c.approved_at} / Version ${c.version}`,
       8,
       false,
-      muted,
+      colors.muted,
     );
-  y -= 5;
-  text(
+  paragraph(
     "This project is a prototype and is not medical advice.",
-    9,
+    8,
     false,
-    muted,
+    colors.muted,
   );
-  doc.getPages().forEach((sheet, index) => {
-    sheet.drawLine({
-      start: { x: left, y: 48 },
-      end: { x: left + width, y: 48 },
-      thickness: 0.6,
-      color: border,
+  const range = doc.bufferedPageRange();
+  for (let index = range.start; index < range.start + range.count; index++) {
+    doc.switchToPage(index);
+    const bottomMargin = doc.page.margins.bottom;
+    doc.page.margins.bottom = 0;
+    doc.save();
+    const footer = doc.page.height - 42;
+    doc
+      .moveTo(margin, footer - 8)
+      .lineTo(margin + width, footer - 8)
+      .lineWidth(0.5)
+      .stroke(colors.line);
+    doc
+      .font("Body")
+      .fontSize(7)
+      .fillColor(colors.muted)
+      .text("NOTICIONER AI / SYNTHETIC DATA ONLY", margin, footer, {
+        lineBreak: false,
+      });
+    doc.text(`${index + 1} / ${range.count}`, margin, footer, {
+      width,
+      align: "right",
+      lineBreak: false,
     });
-    sheet.drawText("CLINISCRIBE AI  /  SYNTHETIC DATA ONLY", {
-      x: left,
-      y: 32,
-      size: 8,
-      font: regular,
-      color: muted,
-    });
-    sheet.drawText(`${index + 1} / ${doc.getPageCount()}`, {
-      x: 515,
-      y: 32,
-      size: 8,
-      font: regular,
-      color: muted,
-    });
-  });
-  return doc.save();
+    doc.restore();
+    doc.page.margins.bottom = bottomMargin;
+  }
+  doc.end();
+  return output;
 }

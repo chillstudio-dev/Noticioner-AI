@@ -254,7 +254,7 @@ test("HTTP workflow persists, reviews, versions, approves and exports; security 
   assert.equal((await req(cookie, "bootstrap")).status, 401);
 });
 
-test("concurrent reviews merge, competing edits reject stale versions, and approval cannot target a stale note", async () => {
+test("concurrent reviews and competing edits reject stale versions, and approval cannot target a stale note", async () => {
   const cookie = await session();
   try {
     const data = (await req(cookie, "bootstrap")).data;
@@ -287,18 +287,18 @@ test("concurrent reviews merge, competing edits reject stale versions, and appro
         }),
       ),
     );
-    assert.ok(results.every((r) => r.status === 200));
+    assert.deepEqual(results.map((r) => r.status).sort(), [200, 409]);
     const reviewed = (await req(cookie, `consultations/${c.id}`)).data;
     assert.ok(
-      flags.every(
+      flags.filter(
         (f) =>
           reviewed.flags.find((g) => g.id === f.id).resolution === "Addressed",
-      ),
+      ).length === 1,
     );
     const edits = await Promise.all(
       [1, 2].map((i) =>
         req(cookie, `consultations/${c.id}/note`, "PATCH", {
-          version: c.version,
+          version: reviewed.version,
           note: {
             statements: c.note.statements.map((s) => ({
               ...s,

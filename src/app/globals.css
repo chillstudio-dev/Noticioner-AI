@@ -1,4 +1,21 @@
 :root {
+  --clinical-evergreen: #07392f;
+  --clinical-evergreen-hover: #0c5144;
+  --clinical-slate: #365762;
+  --clinical-teal: #689b9f;
+  --clinical-muted-blue: #a2b2b7;
+  --clinical-orange: #ff9711;
+  --clinical-violet: #716294;
+  --clinical-canvas: #f3f6f5;
+  --clinical-surface: #ffffff;
+  --clinical-text: #263d3a;
+  --clinical-muted: #5d716b;
+  --clinical-border: #dce6e2;
+  --clinical-focus: #2f8175;
+  --clinical-radius-sm: 8px;
+  --clinical-radius-md: 12px;
+  --clinical-radius-lg: 18px;
+  --clinical-shadow: 0 8px 24px rgb(7 57 47 / 6%);
   --bg: #f6f8f9;
   --surface: #fff;
   --ink: #18312f;
@@ -19,12 +36,14 @@ body {
   color: var(--text);
   font-family:
     "DM Sans Variable",
+    system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  font-size: 14px;
-  line-height: 1.55;
+  font-optical-sizing: auto;
+  font-size: 15px;
+  line-height: 1.6;
 }
 button,
 input,
@@ -128,7 +147,6 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: "Manrope Variable", sans-serif;
   color: var(--ink);
   margin: 0;
   font-weight: 750;
@@ -245,7 +263,6 @@ small {
   gap: 7px;
   color: #193c33;
   text-decoration: none;
-  font-family: "Manrope Variable", sans-serif;
   font-weight: 800;
   font-size: 19px;
   letter-spacing: -0.7px;
@@ -489,7 +506,6 @@ small {
 .stat-value {
   display: block;
   color: #294738;
-  font-family: "Manrope Variable", sans-serif;
   font-size: 32px;
   line-height: 1.4;
   font-weight: 600;
@@ -513,7 +529,6 @@ small {
   position: relative;
 }
 .hero-card h2 {
-  font-family: "Manrope Variable";
   font-size: 25px;
   color: #f5f8f3;
   font-weight: 600;
@@ -1179,7 +1194,6 @@ dd {
   margin: 25px 0;
 }
 .metric-trio strong {
-  font-family: "Manrope Variable";
   font-size: 25px;
   font-weight: 600;
   color: #355d46;
@@ -1207,6 +1221,51 @@ dd {
 }
 .chart-card h2 {
   margin-bottom: 24px;
+}
+.chart-loading {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+.chart-visual {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+.chart-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  font-family: inherit;
+  font-size: 10px;
+  overflow: visible;
+}
+.chart-visual .chart-svg {
+  height: 0;
+  flex: 1;
+}
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.chart-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
 }
 .case {
   padding: 15px 22px;
@@ -1539,6 +1598,13 @@ dialog form > .primary {
   }
 }
 @media (max-width: 640px) {
+  .app-shell {
+    display: block;
+  }
+  .main-shell {
+    width: 100%;
+    margin-left: 0;
+  }
   .sidebar {
     position: static;
     width: 100%;
@@ -2348,7 +2414,7 @@ dialog label {
     max-width: 140px;
   }
 }
-/* Hackathon studio and a focused, source-to-draft presentation view. */
+/* Research prototype studio and focused source-to-draft presentation. */
 .readiness-item {
   display: flex;
   align-items: flex-start;
@@ -2402,3 +2468,452 @@ dialog label {
     display: none;
   }
 }
+.recorder-language {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+  font-size: 13px;
+}
+.recorder-language select {
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d8e4de;
+  border-radius: 8px;
+  background: white;
+  color: #183a37;
+}
+.recorder-playback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.recorder-playback audio {
+  max-width: 100%;
+}
+
+/* Noticioner clinical workspace refresh */
+body {
+  background: var(--clinical-canvas);
+  color: var(--clinical-text);
+}
+h1,
+h2,
+h3,
+h4 {
+  color: var(--clinical-evergreen);
+}
+.sidebar {
+  width: 248px;
+  padding: 24px 16px 16px;
+  background: var(--clinical-surface);
+  border-right-color: var(--clinical-border);
+}
+.brand {
+  color: var(--clinical-evergreen);
+}
+.brandmark {
+  background: var(--clinical-evergreen);
+  border-radius: 10px;
+}
+.brand b {
+  background: #e7efec;
+  color: var(--clinical-slate);
+}
+.workspace-label {
+  border-color: var(--clinical-border);
+  border-radius: var(--clinical-radius-sm);
+  color: var(--clinical-slate);
+  background: #fbfcfc;
+}
+.sidebar nav button {
+  min-height: 44px;
+  border-radius: 9px;
+  color: #526761;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+.sidebar nav button:hover {
+  color: var(--clinical-evergreen);
+  background: #f0f5f3;
+}
+.sidebar nav button.active {
+  color: var(--clinical-evergreen);
+  background: #e8f0ed;
+  box-shadow: inset 3px 0 0 var(--clinical-evergreen);
+}
+.nav-count {
+  background: #e3eeea;
+  color: var(--clinical-evergreen);
+}
+.main-shell {
+  margin-left: 248px;
+  width: calc(100% - 248px);
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  min-height: 68px;
+  height: auto;
+  padding: 12px 32px;
+  border-bottom-color: var(--clinical-border);
+  box-shadow: 0 2px 8px rgb(7 57 47 / 2%);
+}
+.breadcrumb,
+.provider {
+  color: var(--clinical-muted);
+}
+.breadcrumb strong {
+  color: var(--clinical-evergreen);
+  font-weight: 650;
+}
+.prototype {
+  background: #edf2f0;
+  color: #425e58;
+  border-bottom-color: var(--clinical-border);
+}
+.prototype .badge {
+  background: #dfe9e5;
+  color: #365762;
+}
+.content {
+  padding-top: 30px;
+  padding-bottom: 48px;
+}
+.page-heading {
+  align-items: flex-end;
+}
+.page-heading h1 {
+  color: var(--clinical-evergreen);
+  letter-spacing: -0.045em;
+}
+.page-heading p {
+  color: var(--clinical-muted);
+}
+.card,
+.stat,
+.dashboard-grid > .card {
+  border-color: var(--clinical-border);
+  border-radius: var(--clinical-radius-md);
+  box-shadow: 0 2px 8px rgb(7 57 47 / 3%);
+}
+.card-head {
+  border-bottom-color: #e8eeeb;
+}
+.stat {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+.stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--clinical-shadow);
+}
+.stat .row > span {
+  color: var(--clinical-slate);
+}
+.stat .row > svg {
+  color: var(--clinical-teal);
+}
+.stat-value {
+  color: var(--clinical-evergreen);
+  font-variant-numeric: tabular-nums;
+}
+.hero-card {
+  border-radius: var(--clinical-radius-lg);
+  background: var(--clinical-evergreen);
+  box-shadow: 0 12px 32px rgb(7 57 47 / 12%);
+}
+.hero-card button {
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+.hero-card button:hover {
+  transform: translateY(-1px);
+}
+.primary,
+.practice .pr-primary {
+  background: var(--clinical-evergreen);
+  border-color: var(--clinical-evergreen);
+}
+.primary:hover,
+.practice .pr-primary:hover {
+  background: var(--clinical-evergreen-hover);
+  border-color: var(--clinical-evergreen-hover);
+}
+button,
+.button,
+input,
+textarea,
+select {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+button:active:not(:disabled),
+.button:active {
+  transform: translateY(1px);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline-color: var(--clinical-focus);
+}
+.toast,
+.message,
+.pr-message {
+  animation: clinical-notice-in 180ms ease-out both;
+}
+.content > * {
+  animation: clinical-panel-in 180ms ease-out both;
+}
+.content > *:nth-child(n + 2) {
+  animation-delay: 20ms;
+}
+.mobile-menu-button,
+.mobile-nav-backdrop {
+  display: none;
+}
+@keyframes clinical-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes clinical-notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 1200px) and (min-width: 641px) {
+  .sidebar {
+    width: 218px;
+  }
+  .main-shell {
+    margin-left: 218px;
+    width: calc(100% - 218px);
+  }
+  .sidebar nav button {
+    justify-content: flex-start;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .sidebar nav button svg {
+    flex-shrink: 0;
+  }
+  .workspace-label,
+  .nav-label,
+  .sidebar-bottom,
+  .nav-count {
+    display: initial;
+  }
+  .sidebar-bottom {
+    display: block;
+  }
+  .topbar {
+    padding-inline: 22px;
+  }
+}
+@media (max-width: 640px) {
+  .app-shell {
+    display: block;
+  }
+  .main-shell {
+    width: 100%;
+    margin-left: 0;
+  }
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 42;
+    display: flex;
+    width: min(86vw, 320px);
+    height: 100dvh;
+    overflow-y: auto;
+    padding: 20px 16px 16px;
+    border-right: 1px solid var(--clinical-border);
+    border-bottom: 0;
+    box-shadow: 14px 0 40px rgb(7 57 47 / 14%);
+    transform: translateX(-105%);
+    transition: transform 200ms ease;
+  }
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+  .sidebar > .brand {
+    font-size: 18px;
+    justify-content: flex-start;
+  }
+  .sidebar > .brand b,
+  .workspace-label,
+  .nav-label,
+  .sidebar-bottom,
+  .nav-count {
+    display: block;
+  }
+  .workspace-label {
+    margin: 20px 0;
+  }
+  .sidebar nav {
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+  .sidebar nav button {
+    min-width: 0;
+    width: 100%;
+    min-height: 46px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 11px 12px;
+    font-size: 13px;
+  }
+  .sidebar-bottom {
+    margin-top: auto;
+  }
+  .mobile-menu-button {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 8px;
+    color: var(--clinical-evergreen);
+    border-color: var(--clinical-border);
+    border-radius: 10px;
+    flex: 0 0 auto;
+  }
+  .mobile-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 41;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: rgb(14 32 29 / 42%);
+  }
+  .topbar {
+    min-height: 58px;
+    height: auto;
+    gap: 10px;
+    padding: 8px 14px;
+  }
+  .topbar .breadcrumb {
+    flex: 1;
+  }
+  .content {
+    padding: 20px 14px 36px;
+  }
+  .page-heading {
+    align-items: flex-start;
+  }
+  .page-heading h1 {
+    font-size: clamp(23px, 7vw, 29px);
+  }
+  .page-heading > button,
+  .page-heading .row > button {
+    min-height: 44px;
+  }
+  .hero-card {
+    border-radius: 14px;
+  }
+  .dashboard-grid,
+  .consult-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .card,
+  .stat {
+    border-radius: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .content > *,
+  .toast,
+  .message,
+  .pr-message {
+    animation: none !important;
+  }
+  .sidebar,
+  button,
+  .button,
+  .stat {
+    transition: none !important;
+  }
+}
+.translation-panel {
+  border: 1px solid var(--line, #dfe8e3);
+  border-radius: 10px;
+  background: #f6faf8;
+  padding: 18px;
+  margin: 16px 0;
+  min-width: 0;
+}
+.translation-panel h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.translation-panel button {
+  margin-top: 12px;
+}
+.translation-result {
+  margin-top: 18px;
+}
+.translation-result textarea {
+  width: 100%;
+  min-width: 0;
+  resize: vertical;
+  white-space: pre-wrap;
+  border: 1px solid #d5e2da;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  color: #183a37;
+  line-height: 1.7;
+}
+
+/* Trust Engine additions reuse the workspace typography and cards. */
+.trust-review,.trust-quality,.patient-summaries { min-width:0; margin-block:20px; }
+.trust-finding,.trust-summary { border:1px solid #dce4e3; border-radius:12px; padding:16px; margin-block:14px; overflow-wrap:anywhere; }
+.trust-sources,.trust-detail { margin-block:12px; font-size:.85rem; }
+.trust-sources summary,.trust-quality summary,.trust-detail summary { cursor:pointer; padding-block:8px; font-weight:600; }
+.trust-sources blockquote,.trust-paragraph blockquote { margin:8px 0; padding:10px 14px; border-left:3px solid #6ba49b; background:#f4f8f7; white-space:pre-wrap; }
+.trust-disposition label,.trust-paragraph label,.trust-generate>label { display:block; margin-block:12px; }
+.trust-review textarea,.patient-summaries textarea { width:100%; min-height:80px; }
+.trust-table { overflow-x:auto; max-width:100%; margin-block:16px; }
+.trust-table table { border-collapse:collapse; width:100%; font-size:.85rem; }
+.trust-table th,.trust-table td { text-align:left; padding:9px; border-bottom:1px solid #dce4e3; white-space:nowrap; }
+.trust-quality>details { border-top:1px solid #dce4e3; margin-top:18px; padding-top:10px; }
+.trust-quality p,.trust-summary p { line-height:1.6; }
+.trust-generate select { max-width:100%; width:100%; }
+.trust-review button,.trust-summary button,.trust-quality button { margin:4px 8px 4px 0; }
+.trust-quality.card { padding:22px; }
+.patient-summaries.card { padding:18px; }
+.trust-quality label.row,.trust-generate label.row { display:flex; gap:10px; align-items:flex-start; margin-block:16px; }
+.trust-quality input[type="checkbox"],.trust-generate input[type="checkbox"] { width:18px; min-width:18px; flex:0 0 18px; margin-top:4px; }
+@media(max-width:600px) { .trust-quality.card,.patient-summaries.card { padding:16px; } .trust-finding,.trust-summary { padding:12px; } }

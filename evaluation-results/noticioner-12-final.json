@@ -1,0 +1,1057 @@
+{
+  "suite": "noticioner-fidelity-12",
+  "suiteVersion": "fictional-followup-2",
+  "mode": "local-keyword-baseline",
+  "createdAt": "2026-11-15T19:22:06.751Z",
+  "sampleSize": 12,
+  "examples": [
+    {
+      "id": "C01",
+      "transcript": "Patient: I'm here for my usual diabetes follow-up.\nPatient: I've had dry mouth for two days.\nClinician: We'll meet again in three months.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I'm here for my usual diabetes follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I'm here for my usual diabetes follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "I've had dry mouth for two days.",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "I've had dry mouth for two days."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Plan",
+            "text": "We'll meet again in three months.",
+            "category": "followup",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "We'll meet again in three months."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2-duration",
+            "section": "Subjective",
+            "text": "Duration: two days",
+            "category": "duration",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "for two days"
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C02",
+      "transcript": "Patient: I haven't felt dizzy this week.\nPatient: My appetite has been lower since Monday.\nClinician: I have not made an assessment today.\nPatient: I'm here for my regular diabetes follow-up.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I haven't felt dizzy this week.",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I haven't felt dizzy this week."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "My appetite has been lower since Monday.",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "My appetite has been lower since Monday."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Assessment",
+            "text": "I have not made an assessment today.",
+            "category": "assessment",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "I have not made an assessment today."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "I'm here for my regular diabetes follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "I'm here for my regular diabetes follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s1-duration",
+            "section": "Subjective",
+            "text": "Duration: this week",
+            "category": "duration",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "this week"
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2-duration",
+            "section": "Subjective",
+            "text": "Duration: since Monday",
+            "category": "duration",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "since Monday"
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C03",
+      "transcript": "Patient: The tingling began four days ago.\nPatient: Correction: it began yesterday, not four days ago.\nPatient: I still attend my regular diabetes visits.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "Correction: it began yesterday, not four days ago.",
+            "category": "duration",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "Correction: it began yesterday, not four days ago."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Subjective",
+            "text": "I still attend my regular diabetes visits.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "I still attend my regular diabetes visits."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C04",
+      "transcript": "Patient: I take a small white tablet, maybe five milligrams.\nPatient: I don't know its name.\nClinician: Please bring the package next time.\nPatient: This is my usual diabetes follow-up.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I take a small white tablet, maybe five milligrams.",
+            "category": "medication",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I take a small white tablet, maybe five milligrams."
+              }
+            ],
+            "certainty": "Uncertain",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "I don't know its name.",
+            "category": "medication",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "I don't know its name."
+              }
+            ],
+            "certainty": "Uncertain",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Plan",
+            "text": "Please bring the package next time.",
+            "category": "followup",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "Please bring the package next time."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "This is my usual diabetes follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "This is my usual diabetes follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C05",
+      "transcript": "Patient: I think my numb toes mean I have nerve damage.\nClinician: That has not been assessed in this conversation.\nPatient: The numbness comes and goes.\nPatient: I'm here for my usual diabetes follow-up.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "Reports numb toes",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "my numb toes"
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Assessment",
+            "text": "That has not been assessed in this conversation.",
+            "category": "assessment",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "That has not been assessed in this conversation."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Subjective",
+            "text": "The numbness comes and goes.",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "The numbness comes and goes."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "I'm here for my usual diabetes follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "I'm here for my usual diabetes follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s1-patient-theory",
+            "section": "Subjective",
+            "text": "Patient's guess: I think my numb toes mean I have nerve damage.",
+            "category": "other",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I think my numb toes mean I have nerve damage."
+              }
+            ],
+            "certainty": "Uncertain",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C06",
+      "transcript": "Patient: This is my regular follow-up visit for my ongoing asthma care.\nClinician: On examination, the patient's hands are warm.\nPatient: I have not noticed a change in my usual routine.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "This is my regular follow-up visit for my ongoing asthma care.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "This is my regular follow-up visit for my ongoing asthma care."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Objective",
+            "text": "On examination, the patient's hands are warm.",
+            "category": "examination",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "On examination, the patient's hands are warm."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Subjective",
+            "text": "I have not noticed a change in my usual routine.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "I have not noticed a change in my usual routine."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C07",
+      "transcript": "Patient: I have been keeping a note of my questions.\nClinician: Let's review those questions together in two weeks.\nPatient: I can come back then.\nPatient: I'm here for my usual hypertension follow-up.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I have been keeping a note of my questions.",
+            "category": "other",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I have been keeping a note of my questions."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Plan",
+            "text": "Let's review those questions together in two weeks.",
+            "category": "followup",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "Let's review those questions together in two weeks."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Plan",
+            "text": "I can come back then.",
+            "category": "followup",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "I can come back then."
+              }
+            ],
+            "certainty": "Uncertain",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "I'm here for my usual hypertension follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "I'm here for my usual hypertension follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C08",
+      "transcript": "Maybe it was two tablets; I can't remember who changed it.\nPatient: I am not sure when that happened.\nClinician: The medication details remain unclear in this conversation.\nPatient: This is a routine follow-up for my ongoing asthma care.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "Maybe it was two tablets; I can't remember who changed it.",
+            "category": "medication",
+            "speaker": "Unknown",
+            "speakerBasis": "Unknown",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "Maybe it was two tablets; I can't remember who changed it."
+              }
+            ],
+            "certainty": "Uncertain",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "I am not sure when that happened.",
+            "category": "duration",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "I am not sure when that happened."
+              }
+            ],
+            "certainty": "Uncertain",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Assessment",
+            "text": "The medication details remain unclear in this conversation.",
+            "category": "medication",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "The medication details remain unclear in this conversation."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "This is a routine follow-up for my ongoing asthma care.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "This is a routine follow-up for my ongoing asthma care."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C09",
+      "transcript": "Patient: I feel tired in the afternoon.\nPatient: It has been happening for about a week.\nClinician: We have not discussed your medication list today.\nPatient: I'm here for my usual follow-up about ongoing diabetes care.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I feel tired in the afternoon.",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I feel tired in the afternoon."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "It has been happening for about a week.",
+            "category": "duration",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "It has been happening for about a week."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Assessment",
+            "text": "We have not discussed your medication list today.",
+            "category": "medication",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "We have not discussed your medication list today."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "I'm here for my usual follow-up about ongoing diabetes care.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "I'm here for my usual follow-up about ongoing diabetes care."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C10",
+      "transcript": "Patient: I have an allergy to fictional compound Q; it caused an itchy rash.\nPatient: I did not have breathing trouble with it.\nClinician: I have recorded what you told me.\nPatient: This is my routine diabetes follow-up.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I have an allergy to fictional compound Q; it caused an itchy rash.",
+            "category": "allergy",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I have an allergy to fictional compound Q; it caused an itchy rash."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "I did not have breathing trouble with it.",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "I did not have breathing trouble with it."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Subjective",
+            "text": "I have recorded what you told me.",
+            "category": "other",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "I have recorded what you told me."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "This is my routine diabetes follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "This is my routine diabetes follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C11",
+      "transcript": "Patient: I have had less appetite lately.\nPatient: I don't know exactly when it started.\nClinician: I have not recorded an examination finding today.\nPatient: I'm here for my usual diabetes follow-up.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        },
+        {
+          "sourceId": "S04",
+          "generatedId": "s4"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I have had less appetite lately.",
+            "category": "complaint",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I have had less appetite lately."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Subjective",
+            "text": "I don't know exactly when it started.",
+            "category": "duration",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "I don't know exactly when it started."
+              }
+            ],
+            "certainty": "Uncertain",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Objective",
+            "text": "I have not recorded an examination finding today.",
+            "category": "examination",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "I have not recorded an examination finding today."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s4",
+            "section": "Subjective",
+            "text": "I'm here for my usual diabetes follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s4",
+                "quote": "I'm here for my usual diabetes follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "C12",
+      "transcript": "Patient: I am here for a continuing-care follow-up.\nClinician: The recorded weight today is 62 kilograms.\nClinician: The next visit is scheduled in six weeks.",
+      "segmentMap": [
+        {
+          "sourceId": "S01",
+          "generatedId": "s1"
+        },
+        {
+          "sourceId": "S02",
+          "generatedId": "s2"
+        },
+        {
+          "sourceId": "S03",
+          "generatedId": "s3"
+        }
+      ],
+      "note": {
+        "statements": [
+          {
+            "id": "f-s1",
+            "section": "Subjective",
+            "text": "I am here for a continuing-care follow-up.",
+            "category": "history",
+            "speaker": "Patient",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s1",
+                "quote": "I am here for a continuing-care follow-up."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s2",
+            "section": "Objective",
+            "text": "The recorded weight today is 62 kilograms.",
+            "category": "examination",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s2",
+                "quote": "The recorded weight today is 62 kilograms."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          },
+          {
+            "id": "f-s3",
+            "section": "Plan",
+            "text": "The next visit is scheduled in six weeks.",
+            "category": "followup",
+            "speaker": "Clinician",
+            "speakerBasis": "Explicit",
+            "evidence": [
+              {
+                "segmentId": "s3",
+                "quote": "The next visit is scheduled in six weeks."
+              }
+            ],
+            "certainty": "Supported",
+            "rejectedEvidence": []
+          }
+        ]
+      }
+    }
+  ]
+}

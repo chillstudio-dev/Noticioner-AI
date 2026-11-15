@@ -72,6 +72,32 @@ test("baseline retains negation and does not fabricate missing exam", () => {
   assert.equal(n.statements[0].text, "I have no known allergies.");
   assert.equal(n.statements.filter((s) => s.section === "Objective").length, 0);
 });
+test("baseline separates symptom and duration, and captures spoken follow-up as Plan", () => {
+  const source = parseTranscript("Patient: I've had dry mouth for two days.\nClinician: We'll meet again in three months.");
+  const note = baseline(source);
+  assert.ok(note.statements.some((s) => s.category === "complaint" && s.evidence[0]?.segmentId === "s1"));
+  assert.ok(note.statements.some((s) => s.category === "duration" && s.text === "Duration: two days" && s.evidence[0]?.quote === "for two days"));
+  assert.ok(note.statements.some((s) => s.category === "followup" && s.section === "Plan" && s.evidence[0]?.segmentId === "s2"));
+});
+test("baseline uses a patient's explicit correction as the current duration", () => {
+  const note = baseline(parseTranscript("Patient: It started three days ago.\nPatient: Actually, it started yesterday."));
+  assert.equal(note.statements.length, 1);
+  assert.match(note.statements[0].text, /yesterday/);
+  assert.equal(note.statements[0].category, "duration");
+});
+test("baseline limits medication context to the immediately connected turn and scopes corrections by their evidence", () => {
+  const note = baseline(parseTranscript("Patient: I take a tablet.\nPatient: My throat hurts.\nPatient: I don't know its name.\nPatient: My headache began three days ago.\nPatient: My cough began three days ago.\nPatient: Correction: my headache began yesterday, not three days ago."));
+  assert.equal(note.statements.find((s) => s.text === "I don't know its name.")?.category, "other");
+  assert.ok(note.statements.some((s) => s.text === "My cough began three days ago."));
+  assert.ok(!note.statements.some((s) => s.text === "My headache began three days ago."));
+});
+test("baseline keeps patient diagnostic guesses uncertain and medication context across adjacent turns", () => {
+  const note = baseline(parseTranscript("Patient: I take a small white tablet.\nPatient: I don't know its name.\nPatient: I think my numb toes mean I have nerve damage."));
+  assert.ok(note.statements.some((s) => s.category === "medication" && s.text.includes("don't know") && s.certainty === "Uncertain"));
+  assert.ok(note.statements.some((s) => s.category === "other" && s.text.startsWith("Patient's guess:") && s.certainty === "Uncertain"));
+  assert.ok(note.statements.some((s) => s.category === "complaint" && s.text === "Reports numb toes" && s.certainty === "Supported" && s.evidence[0]?.quote === "my numb toes"));
+  assert.ok(note.statements.every((s) => s.evidence.every((e) => e.quote.length > 0)));
+});
 test("medication omissions are transparent documentation flags", () => {
   const s = parseTranscript("Patient: I take a tablet.");
   const f = flagsFor(baseline(s), s);

@@ -5,7 +5,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 ENV NODE_ENV=production
-ENV DATABASE_PATH=/app/data/cliniscribe.sqlite
+ENV DATABASE_PATH=/app/data/noticioner.sqlite
 RUN mkdir -p /app/data && chown -R node:node /app
 USER node
 EXPOSE 3000

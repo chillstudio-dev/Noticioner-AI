@@ -1,0 +1,876 @@
+{
+  "suite": "noticioner-fidelity-12",
+  "suite_version": "fictional-followup-2",
+  "purpose": "Evaluate faithful capture of statements in fictional primary-care follow-up conversations. This is not a clinical accuracy or safety benchmark.",
+  "coverage_map": {
+    "straightforward_symptoms_and_history": [
+      "C01",
+      "C11",
+      "C12"
+    ],
+    "clear_negation": [
+      "C02",
+      "C10"
+    ],
+    "patient_correction": [
+      "C03"
+    ],
+    "uncertain_or_incomplete_medication": [
+      "C04",
+      "C08"
+    ],
+    "patient_diagnostic_guess": [
+      "C05"
+    ],
+    "explicit_clinician_observation": [
+      "C06",
+      "C12"
+    ],
+    "spoken_followup_plan": [
+      "C01",
+      "C07",
+      "C12"
+    ],
+    "ambiguous_speaker_or_statement": [
+      "C08"
+    ],
+    "plausible_but_unstated_detail": [
+      "C09"
+    ]
+  },
+  "cases": [
+    {
+      "id": "C01",
+      "name": "Routine follow-up with symptom and history",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I'm here for my usual diabetes follow-up."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I've had dry mouth for two days."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "We'll meet again in three months."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I'm here for my usual diabetes follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says this is their usual diabetes follow-up."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "I've had dry mouth for two days.",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient reports dry mouth."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "I've had dry mouth for two days.",
+          "category": "duration",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The dry mouth has lasted two days."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "We'll meet again in three months.",
+          "category": "followup",
+          "soap_section": "Plan",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician says they will meet again in three months."
+        }
+      ],
+      "must_not_infer": [
+        "A blood glucose value or trend",
+        "Medication adherence",
+        "A diagnosis beyond the patient's stated diabetes follow-up"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Checks a direct symptom, its duration, a stated ongoing-care context, and a spoken follow-up interval."
+    },
+    {
+      "id": "C02",
+      "name": "Explicit symptom denial",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I haven't felt dizzy this week."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "My appetite has been lower since Monday."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "I have not made an assessment today."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my regular diabetes follow-up."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I haven't felt dizzy this week.",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient denies dizziness this week."
+        },
+        {
+          "source_segment_id": "S01",
+          "quote": "I haven't felt dizzy this week.",
+          "category": "duration",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient describes the timeframe of the dizziness denial as this week."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "My appetite has been lower since Monday.",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient reports lower appetite."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "My appetite has been lower since Monday.",
+          "category": "duration",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The lower appetite has been present since Monday."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "I have not made an assessment today.",
+          "category": "assessment",
+          "soap_section": "Assessment",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician says no assessment was made today."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "I'm here for my regular diabetes follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says they are here for a regular diabetes follow-up."
+        }
+      ],
+      "must_not_infer": [
+        "Dizziness is present",
+        "The patient has no other symptoms",
+        "A cause for the appetite change"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Tests whether a clear negation remains a denial while nearby positive symptom statements are captured separately."
+    },
+    {
+      "id": "C03",
+      "name": "Patient corrects an earlier duration",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "The tingling began four days ago."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "Correction: it began yesterday, not four days ago."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "I still attend my regular diabetes visits."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S02",
+          "quote": "Correction: it began yesterday, not four days ago.",
+          "category": "duration",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient corrects the onset to yesterday; it did not begin four days ago."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "I still attend my regular diabetes visits.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says they continue attending regular diabetes visits."
+        }
+      ],
+      "must_not_infer": [
+        "A cause for the tingling",
+        "A change to the patient's ongoing care"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Checks that the corrected duration replaces the earlier value without losing the explicit negation of the old value."
+    },
+    {
+      "id": "C04",
+      "name": "Uncertain medication name and dose",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I take a small white tablet, maybe five milligrams."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I don't know its name."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "Please bring the package next time."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "This is my usual diabetes follow-up."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I take a small white tablet, maybe five milligrams.",
+          "category": "medication",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Uncertain",
+          "normalized_statement": "The patient reports taking a small white tablet; the dose may be five milligrams."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "I don't know its name.",
+          "category": "medication",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Uncertain",
+          "normalized_statement": "The patient does not know the tablet's name."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "Please bring the package next time.",
+          "category": "followup",
+          "soap_section": "Plan",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician asks the patient to bring the package next time."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "This is my usual diabetes follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says this is their usual diabetes follow-up."
+        }
+      ],
+      "must_not_infer": [
+        "The tablet's name",
+        "A confirmed five milligram dose",
+        "Route or frequency",
+        "A medication recommendation"
+      ],
+      "expected_review_prompts": [
+        "Clarify the tablet name and confirm whether the patient-recalled dose is five milligrams."
+      ],
+      "why_useful": "Tests preservation of incomplete medication details and their uncertainty without filling in a plausible drug or schedule."
+    },
+    {
+      "id": "C05",
+      "name": "Patient offers a diagnostic guess",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I think my numb toes mean I have nerve damage."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "That has not been assessed in this conversation."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "The numbness comes and goes."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual diabetes follow-up."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I think my numb toes mean I have nerve damage.",
+          "category": "other",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Uncertain",
+          "normalized_statement": "The patient guesses that numb toes mean nerve damage; this is their guess, not a clinician assessment."
+        },
+        {
+          "source_segment_id": "S01",
+          "quote": "my numb toes",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient describes their toes as numb."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "That has not been assessed in this conversation.",
+          "category": "assessment",
+          "soap_section": "Assessment",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician says this was not assessed in the conversation."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "The numbness comes and goes.",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient reports intermittent numbness."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "I'm here for my usual diabetes follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says they are here for a usual diabetes follow-up."
+        }
+      ],
+      "must_not_infer": [
+        "Nerve damage is established",
+        "A cause for the numbness",
+        "A diagnostic conclusion by the clinician"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Checks speaker attribution and uncertainty when a patient states a plausible but unconfirmed diagnosis."
+    },
+    {
+      "id": "C06",
+      "name": "Clinician states an observation",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "This is my regular follow-up visit for my ongoing asthma care."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "On examination, the patient's hands are warm."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "I have not noticed a change in my usual routine."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+        "quote": "This is my regular follow-up visit for my ongoing asthma care.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+        "normalized_statement": "The patient describes a regular follow-up visit for ongoing asthma care."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "On examination, the patient's hands are warm.",
+          "category": "examination",
+          "soap_section": "Objective",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician observes warm hands on examination."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "I have not noticed a change in my usual routine.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient has not noticed a change in their usual routine."
+        }
+      ],
+      "must_not_infer": [
+        "Other examination findings",
+        "Normal examination overall",
+        "A measured temperature"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Tests separation of a clinician's explicit observation from broader examination findings that were never stated."
+    },
+    {
+      "id": "C07",
+      "name": "Follow-up plan spoken aloud",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I have been keeping a note of my questions."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "Let's review those questions together in two weeks."
+        },
+        {
+          "id": "S03",
+          "speaker": "Patient",
+          "text": "I can come back then."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual hypertension follow-up."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I have been keeping a note of my questions.",
+          "category": "other",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient has been keeping a note of questions."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "Let's review those questions together in two weeks.",
+          "category": "followup",
+          "soap_section": "Plan",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician proposes reviewing the questions together in two weeks."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "I can come back then.",
+          "category": "followup",
+          "soap_section": "Plan",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says they can return then."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "I'm here for my usual hypertension follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says they are here for a usual hypertension follow-up."
+        }
+      ],
+      "must_not_infer": [
+        "A specific appointment date",
+        "Additional instructions for the patient",
+        "A clinical recommendation"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Checks whether the exact follow-up interval and patient response are retained without inventing a calendar date."
+    },
+    {
+      "id": "C08",
+      "name": "Ambiguous speaker and medication statement",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Unknown",
+          "text": "Maybe it was two tablets; I can't remember who changed it."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I am not sure when that happened."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "The medication details remain unclear in this conversation."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "This is a routine follow-up for my ongoing asthma care."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "Maybe it was two tablets; I can't remember who changed it.",
+          "category": "medication",
+          "soap_section": "Subjective",
+          "speaker": "Unknown",
+          "certainty": "Uncertain",
+          "normalized_statement": "An unknown speaker says it may have been two tablets and cannot recall who changed it."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "I am not sure when that happened.",
+          "category": "duration",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Uncertain",
+          "normalized_statement": "The patient is unsure when it happened."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "The medication details remain unclear in this conversation.",
+          "category": "medication",
+          "soap_section": "Assessment",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician says the medication details remain unclear in this conversation."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "This is a routine follow-up for my ongoing asthma care.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says this is a routine follow-up for their ongoing asthma care."
+        }
+      ],
+      "must_not_infer": [
+        "The identity of the speaker in S01",
+        "The medicine name or strength",
+        "Who changed the medication",
+        "A confirmed two-tablet amount"
+      ],
+      "expected_review_prompts": [
+        "Clarify which medication is being discussed, the amount, who made the change, and when it happened."
+      ],
+      "why_useful": "Combines unknown speaker attribution with explicitly uncertain medication amount, actor, and timing."
+    },
+    {
+      "id": "C09",
+      "name": "Plausible detail deliberately absent",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I feel tired in the afternoon."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "It has been happening for about a week."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "We have not discussed your medication list today."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual follow-up about ongoing diabetes care."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I feel tired in the afternoon.",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient reports afternoon tiredness."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "It has been happening for about a week.",
+          "category": "duration",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The afternoon tiredness has occurred for about a week."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "We have not discussed your medication list today.",
+          "category": "medication",
+          "soap_section": "Assessment",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician says the medication list was not discussed today."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "I'm here for my usual follow-up about ongoing diabetes care.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says they are here for their usual follow-up about ongoing diabetes care."
+        }
+      ],
+      "must_not_infer": [
+        "The patient takes no medication",
+        "The patient has no allergies",
+        "Examination findings",
+        "A cause for tiredness"
+      ],
+      "expected_review_prompts": [
+        "Medication history was not discussed in this conversation."
+      ],
+      "why_useful": "Tests whether silence or an explicitly undiscussed topic is incorrectly transformed into a negative fact."
+    },
+    {
+      "id": "C10",
+      "name": "Allergy statement with symptom negation",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I have an allergy to fictional compound Q; it caused an itchy rash."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I did not have breathing trouble with it."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "I have recorded what you told me."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "This is my routine diabetes follow-up."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I have an allergy to fictional compound Q; it caused an itchy rash.",
+          "category": "allergy",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient reports an allergy to fictional compound Q associated with an itchy rash."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "I did not have breathing trouble with it.",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient denies breathing trouble with the reported reaction."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "I have recorded what you told me.",
+          "category": "other",
+          "soap_section": "Subjective",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician says they recorded the patient's report."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "This is my routine diabetes follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says this is their routine diabetes follow-up."
+        }
+      ],
+      "must_not_infer": [
+        "A verified allergy beyond the patient's report",
+        "A medication safety conclusion",
+        "Other symptoms or their absence"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Tests reported allergy provenance and preservation of a specific negated symptom without broadening it."
+    },
+    {
+      "id": "C11",
+      "name": "Symptom with incomplete onset timing",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I have had less appetite lately."
+        },
+        {
+          "id": "S02",
+          "speaker": "Patient",
+          "text": "I don't know exactly when it started."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "I have not recorded an examination finding today."
+        },
+        {
+          "id": "S04",
+          "speaker": "Patient",
+          "text": "I'm here for my usual diabetes follow-up."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I have had less appetite lately.",
+          "category": "complaint",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient reports lower appetite."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "I don't know exactly when it started.",
+          "category": "duration",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Uncertain",
+          "normalized_statement": "The patient does not know the exact onset time."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "I have not recorded an examination finding today.",
+          "category": "examination",
+          "soap_section": "Objective",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician says no examination finding was recorded today."
+        },
+        {
+          "source_segment_id": "S04",
+          "quote": "I'm here for my usual diabetes follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says they are here for a usual diabetes follow-up."
+        }
+      ],
+      "must_not_infer": [
+        "A specific onset date or duration",
+        "A normal examination",
+        "A cause for the appetite change"
+      ],
+      "expected_review_prompts": [
+        "The patient is unsure when the appetite change began."
+      ],
+      "why_useful": "Checks explicit uncertainty in symptom timing and prevents absence of an exam entry from becoming a normal finding."
+    },
+    {
+      "id": "C12",
+      "name": "Numeric observation and scheduled follow-up",
+      "segments": [
+        {
+          "id": "S01",
+          "speaker": "Patient",
+          "text": "I am here for a continuing-care follow-up."
+        },
+        {
+          "id": "S02",
+          "speaker": "Clinician",
+          "text": "The recorded weight today is 62 kilograms."
+        },
+        {
+          "id": "S03",
+          "speaker": "Clinician",
+          "text": "The next visit is scheduled in six weeks."
+        }
+      ],
+      "gold_facts": [
+        {
+          "source_segment_id": "S01",
+          "quote": "I am here for a continuing-care follow-up.",
+          "category": "history",
+          "soap_section": "Subjective",
+          "speaker": "Patient",
+          "certainty": "Supported",
+          "normalized_statement": "The patient says this is a continuing-care follow-up."
+        },
+        {
+          "source_segment_id": "S02",
+          "quote": "The recorded weight today is 62 kilograms.",
+          "category": "examination",
+          "soap_section": "Objective",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The clinician states that today's recorded weight is 62 kilograms."
+        },
+        {
+          "source_segment_id": "S03",
+          "quote": "The next visit is scheduled in six weeks.",
+          "category": "followup",
+          "soap_section": "Plan",
+          "speaker": "Clinician",
+          "certainty": "Supported",
+          "normalized_statement": "The next visit is scheduled in six weeks."
+        }
+      ],
+      "must_not_infer": [
+        "A change in weight",
+        "A weight interpretation",
+        "An appointment date or other follow-up instruction"
+      ],
+      "expected_review_prompts": [],
+      "why_useful": "Checks exact numeric retention, clinician attribution, objective SOAP placement, and a spoken follow-up interval."
+    }
+  ]
+}

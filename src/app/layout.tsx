@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import "@fontsource-variable/dm-sans";
-import "@fontsource-variable/manrope";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "CliniScribe AI · Clinical workspace",
+  title: "Noticioner AI · Clinical workspace",
   description:
     "Explainable clinical documentation research prototype. Synthetic demonstration data only.",
 };

@@ -4,6 +4,11 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, delimiter, join, resolve } from "node:path";
 import { promisify } from "node:util";
+import {
+  languageSchema,
+  speechLanguages,
+  type SpeechLanguage,
+} from "./languages";
 
 const execute = promisify(execFile);
 let running = false;
@@ -26,7 +31,7 @@ function configuration() {
   return {
     model: resolve(
       /* turbopackIgnore: true */
-      process.env.LOCAL_WHISPER_MODEL || "data/models/ggml-base.en.bin",
+      process.env.LOCAL_WHISPER_MODEL || "data/models/ggml-base.bin",
     ),
     whisper: executable(process.env.LOCAL_WHISPER_BIN || "whisper-cli"),
     ffmpeg: executable(process.env.FFMPEG_BIN || "ffmpeg"),
@@ -42,6 +47,9 @@ export function localTranscriptionStatus() {
   } catch {}
   return {
     configured: !!(readable && config.whisper && config.ffmpeg),
+    languages: /\.en(?:[.-]|$)/i.test(basename(config.model))
+      ? (["en"] as SpeechLanguage[])
+      : speechLanguages.map((language) => language.code),
     model: basename(config.model)
       .replace(/^ggml-/, "")
       .replace(/\.bin$/, ""),
@@ -77,11 +85,20 @@ function inspectPcm(wav: Buffer) {
   throw new Error("The audio could not be decoded. Please record again.");
 }
 
-export async function transcribeLocally(audio: File, signal?: AbortSignal) {
+export async function transcribeLocally(
+  audio: File,
+  signal?: AbortSignal,
+  language: SpeechLanguage = "en",
+) {
+  languageSchema.parse(language);
   const config = configuration();
   if (!localTranscriptionStatus().configured)
     throw new Error(
       "Local transcription is not ready. Install whisper.cpp and FFmpeg, then run npm run setup:transcription on the server.",
+    );
+  if (!localTranscriptionStatus().languages.includes(language))
+    throw new Error(
+      "This local model only supports English. Install the multilingual model with npm run setup:transcription and update LOCAL_WHISPER_MODEL.",
     );
   if (running)
     throw new Error(
@@ -92,7 +109,7 @@ export async function transcribeLocally(audio: File, signal?: AbortSignal) {
   running = true;
   let directory: string | undefined;
   try {
-    directory = await mkdtemp(join(tmpdir(), "cliniscribe-audio-"));
+    directory = await mkdtemp(join(tmpdir(), "noticioner-audio-"));
     const input = join(directory, "recording"),
       wav = join(directory, "recording.wav"),
       output = join(directory, "transcript");
@@ -159,7 +176,7 @@ export async function transcribeLocally(audio: File, signal?: AbortSignal) {
           "-f",
           wav,
           "-l",
-          "en",
+          language,
           "-otxt",
           "-of",
           output,

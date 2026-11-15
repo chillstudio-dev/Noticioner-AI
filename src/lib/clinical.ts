@@ -16,6 +16,10 @@ export const statementSchema = z.object({
   evidence: z
     .array(z.object({ segmentId: z.string(), quote: z.string().min(1) }))
     .max(20),
+  rejectedEvidence: z
+    .array(z.object({ segmentId: z.string(), quote: z.string() }))
+    .max(20)
+    .optional(),
   certainty: z.enum(["Supported", "Uncertain", "Unsupported"]),
   category: z.enum([
     "complaint",
@@ -35,6 +39,7 @@ export const noteSchema = z.object({
 export type Statement = z.infer<typeof statementSchema>;
 export type Note = z.infer<typeof noteSchema>;
 export type Flag = {
+  trust?: import("./trust-engine").TrustFinding;
   id: string;
   category: string;
   message: string;
@@ -114,6 +119,7 @@ export function validateEvidence(note: Note, segments: Segment[]): Note {
       return {
         ...s,
         evidence,
+        rejectedEvidence: s.evidence.filter((e) => !evidence.includes(e)),
         speaker,
         speakerBasis,
         certainty: !evidence.length
@@ -128,50 +134,120 @@ export function validateEvidence(note: Note, segments: Segment[]): Note {
   };
 }
 export function baseline(segments: Segment[]): Note {
-  const statements: Statement[] = segments.map((s) => {
+  const activeSegments = segments.filter((segment, index) => {
+    const later = segments.slice(index + 1);
+    return !later.some((correction, offset) => {
+      if (!/\b(?:correction|actually)\b/i.test(correction.text)) return false;
+      const durationPattern = /\b(?:yesterday|(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:days?|weeks?|months?|years?))\b/i;
+      const oldDuration = segment.text.match(durationPattern)?.[0];
+      const correctedDuration = correction.text.match(durationPattern)?.[0];
+      if (!oldDuration || !correctedDuration || oldDuration.toLowerCase() === correctedDuration.toLowerCase()) return false;
+      const topics = ["headache", "cough", "tingling", "numbness", "numb toes", "dry mouth", "dizziness", "appetite", "tiredness", "rash", "sore throat"];
+      const priorTopic = topics.find((topic) => segment.text.toLowerCase().includes(topic));
+      const correctionTopic = topics.find((topic) => correction.text.toLowerCase().includes(topic));
+      const explicitlyRejectsPrior = correction.text.toLowerCase().includes(oldDuration.toLowerCase());
+      if (priorTopic && correctionTopic) return priorTopic === correctionTopic && explicitlyRejectsPrior;
+      if (priorTopic || correctionTopic) {
+        return offset === 0 && explicitlyRejectsPrior &&
+          /\b(?:it|this)\s+(?:started|began)\b/i.test(correction.text);
+      }
+      return offset === 0 &&
+        /\b(?:it|this)\s+(?:started|began)\b/i.test(segment.text) &&
+        /\b(?:it|this)\s+(?:started|began)\b/i.test(correction.text);
+    });
+  });
+  const statements: Statement[] = activeSegments.map((s, index) => {
     let category: Statement["category"] = "other";
     let section: Statement["section"] = "Subjective";
+    const previousText = activeSegments[index - 1]?.text ?? "";
+    const medicationContext = /\b(?:its|the)\s+(?:name|dose|strength|amount)\b/i.test(s.text) && /medication|tablet|\bmg\b|inhaler/i.test(previousText);
+    const patientTheory = s.speaker === "Patient" && /\bI think\b/i.test(s.text) && /\b(?:means?|might|could|diagnosis|disease|condition)\b/i.test(s.text);
+    const symptomPhrase = patientTheory ? s.text.match(/\b(?:my|I have|I feel)\s+(?:[a-z]+\s+){0,2}(?:numb(?:ness)?(?:\s+toes?)?|tingling|cough|headache|pain|rash|dizziness|sore throat)\b/i)?.[0] : undefined;
+    const symptomPrefix = symptomPhrase ? s.text.slice(0, s.text.indexOf(symptomPhrase)) : "";
+    const safelyAssertedSymptom = symptomPhrase && !/\b(?:no|not|never|don't|do not|denies)\b/i.test(symptomPrefix.slice(-40)) ? symptomPhrase : undefined;
     if (/allerg/i.test(s.text)) category = "allergy";
-    else if (/medication|tablet|\bmg\b|taking|inhaler/i.test(s.text))
+    else if (/medication|tablet|\bmg\b|taking|inhaler/i.test(s.text) || medicationContext)
       category = "medication";
     else if (
       ["Doctor", "Nurse", "Clinician"].includes(s.speaker) &&
-      /assessment|impression|suspect/i.test(s.text)
+      /assessment|assessed|impression|suspect/i.test(s.text)
     ) {
       category = "assessment";
       section = "Assessment";
     } else if (
-      ["Doctor", "Nurse", "Clinician"].includes(s.speaker) &&
-      /follow.up|return|review in|plan:|refer|arrange/i.test(s.text)
+      /^(?:Patient|Doctor|Nurse|Clinician)$/.test(s.speaker) &&
+      (/\b(?:follow.up\s*:\s*|return in|review in|plan:|refer|arrange|meet again|next visit is scheduled|come back then|bring .* next time)\b/i.test(s.text) ||
+        (["Doctor", "Nurse", "Clinician"].includes(s.speaker) && /\b(?:review|return|follow.up)\b/i.test(s.text)))
     ) {
       category = "followup";
       section = "Plan";
     } else if (
       ["Doctor", "Nurse", "Clinician"].includes(s.speaker) &&
-      /examination|temperature|blood pressure|on exam|pulse/i.test(s.text)
+      /examination|temperature|blood pressure|on exam|pulse|recorded weight/i.test(s.text)
     ) {
       category = "examination";
       section = "Objective";
-    } else if (/days|weeks|months|since|yesterday/i.test(s.text))
+    } else if (
+      /\b(?:regular|usual|routine|continuing.care|attend|attendance).{0,50}(?:follow.up|visit|diabetes)|(?:follow.up|visit).{0,50}\b(?:regular|usual|routine)\b|here for .*follow.up|usual routine|not noticed a change/i.test(s.text)
+    )
+      category = "history";
+    else if (/\b(?:correction|actually)\b/i.test(s.text) && /\b(?:days?|weeks?|months?|years?|yesterday)\b/i.test(s.text))
       category = "duration";
     else if (/history|previous/i.test(s.text)) category = "history";
-    else if (/pain|cough|headache|feel|sore/i.test(s.text))
+    else if (/pain|cough|headache|feel|sore|dry mouth|dizz|appetite|tingling|numb|tired|rash|breathing trouble|nausea|vomit/i.test(s.text))
       category = "complaint";
+    else if (/\b(?:days?|weeks?|months?|years?|since|yesterday|when it started|when that happened|onset)\b/i.test(s.text))
+      category = "duration";
+    if (
+      category === "medication" &&
+      ["Doctor", "Nurse", "Clinician"].includes(s.speaker) &&
+      /\b(?:not discussed|unclear|not established)\b/i.test(s.text)
+    ) section = "Assessment";
     return {
       id: `f-${s.id}`,
       section,
-      text: s.text,
+      text: safelyAssertedSymptom ? `Reports ${safelyAssertedSymptom.replace(/^(?:my|I have|I feel)\s+/i, "")}` : s.text,
       category,
       speaker: s.speaker,
       speakerBasis: s.speaker === "Unknown" ? "Unknown" : "Explicit",
-      evidence: [{ segmentId: s.id, quote: s.text }],
-      certainty: /maybe|not sure|perhaps|think|actually|don't remember/i.test(
+      evidence: [{ segmentId: s.id, quote: safelyAssertedSymptom ?? s.text }],
+      certainty: safelyAssertedSymptom ? "Supported" : /maybe|not sure|perhaps|think|don't remember|can't remember|can't recall|don't know|do not know|uncertain/i.test(
         s.text,
       )
         ? "Uncertain"
         : "Supported",
     };
   });
+  for (const s of activeSegments) {
+    const hasComplaint = statements.some((statement) => statement.id === `f-${s.id}` && statement.category === "complaint");
+    if (!hasComplaint) continue;
+    const duration = s.text.match(/\b(?:for|since|about|around)\s+(?:this\s+|last\s+)?(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+(?:days?|weeks?|months?|years?)\b|\bsince\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|\b(?:yesterday|this week|last week)\b/i)?.[0];
+    if (!duration) continue;
+    const normalizedDuration = duration.replace(/^(?:for|about|around)\s+/i, "");
+    statements.push({
+      id: `f-${s.id}-duration`,
+      section: "Subjective",
+      text: `Duration: ${normalizedDuration}`,
+      category: "duration",
+      speaker: s.speaker,
+      speakerBasis: s.speaker === "Unknown" ? "Unknown" : "Explicit",
+      evidence: [{ segmentId: s.id, quote: duration }],
+      certainty: /maybe|not sure|perhaps|actually|don't know|do not know|uncertain/i.test(s.text) ? "Uncertain" : "Supported",
+    });
+  }
+  for (const s of activeSegments) {
+    if (s.speaker !== "Patient" || !/\bI think\b/i.test(s.text) || !/\b(?:means?|might|could|diagnosis|disease|condition)\b/i.test(s.text)) continue;
+    statements.push({
+      id: `f-${s.id}-patient-theory`,
+      section: "Subjective",
+      text: `Patient's guess: ${s.text}`,
+      category: "other",
+      speaker: "Patient",
+      speakerBasis: "Explicit",
+      evidence: [{ segmentId: s.id, quote: s.text }],
+      certainty: "Uncertain",
+    });
+  }
   return { statements };
 }
 export function flagsFor(note: Note, segments: Segment[]): Flag[] {
@@ -272,7 +348,14 @@ export function assertApproval(
     throw new Error(
       "Review the document and explicitly confirm simulated approval.",
     );
-  if (flags.some((f) => f.resolution === "Open"))
+  if (
+    flags.some(
+      (f) =>
+        f.trust?.required !== false &&
+        (f.resolution === "Open" ||
+          (f.trust?.required && f.note.trim().length < 3)),
+    )
+  )
     throw new Error(
       "Address or acknowledge every review flag before approval.",
     );

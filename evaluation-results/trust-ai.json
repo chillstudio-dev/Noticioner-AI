@@ -1,0 +1,229 @@
+{
+  "suite": "trust",
+  "suiteVersion": "synthetic-author-1",
+  "checkerVersion": "trust-1.0.0",
+  "mode": "ai",
+  "model": "claude-sonnet-5-5",
+  "provider": "anthropic",
+  "createdAt": "2026-11-15T14:57:27.328Z",
+  "sampleSize": 8,
+  "completed": 8,
+  "errors": 0,
+  "latencyMs": 24630,
+  "overall": {
+    "tp": 5,
+    "fp": 2,
+    "fn": 0,
+    "precision": 0.7142857142857143,
+    "recall": 1,
+    "f1": 0.8333333333333333
+  },
+  "byCategory": [
+    {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "category": "evidence"
+    },
+    {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "category": "gaps"
+    },
+    {
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1,
+      "f1": 0.8,
+      "category": "consistency"
+    },
+    {
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.5,
+      "recall": 1,
+      "f1": 0.6666666666666666,
+      "category": "safety"
+    }
+  ],
+  "examples": [
+    {
+      "id": "e3",
+      "name": "Negation reversal",
+      "category": "evidence",
+      "expected": [
+        "evidence:c1",
+        "consistency:c1|source:s1"
+      ],
+      "predicted": [
+        "evidence:c1",
+        "consistency:c1|source:s1"
+      ],
+      "missing": [],
+      "extra": [],
+      "metrics": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "latencyMs": 3167
+    },
+    {
+      "id": "e4",
+      "name": "Exact wording is not semantic certification",
+      "category": "evidence",
+      "expected": [],
+      "predicted": [],
+      "missing": [],
+      "extra": [],
+      "metrics": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "latencyMs": 2009
+    },
+    {
+      "id": "g1",
+      "name": "allergy not established",
+      "category": "gaps",
+      "expected": [
+        "gaps:allergy"
+      ],
+      "predicted": [
+        "gaps:allergy"
+      ],
+      "missing": [],
+      "extra": [],
+      "metrics": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "latencyMs": 2916
+    },
+    {
+      "id": "g5",
+      "name": "Explicit unknowns are documented",
+      "category": "gaps",
+      "expected": [],
+      "predicted": [],
+      "missing": [],
+      "extra": [],
+      "metrics": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "latencyMs": 2617
+    },
+    {
+      "id": "c1",
+      "name": "Conflicting negation",
+      "category": "consistency",
+      "expected": [
+        "consistency:source:a|source:b"
+      ],
+      "predicted": [
+        "consistency:source:a|source:b",
+        "consistency:cough"
+      ],
+      "missing": [],
+      "extra": [
+        "consistency:cough"
+      ],
+      "metrics": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1,
+        "f1": 0.6666666666666666
+      },
+      "latencyMs": 4202
+    },
+    {
+      "id": "c5",
+      "name": "Agreeing sources",
+      "category": "consistency",
+      "expected": [],
+      "predicted": [],
+      "missing": [],
+      "extra": [],
+      "metrics": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "latencyMs": 2891
+    },
+    {
+      "id": "s1",
+      "name": "Synthetic penicillin and amoxicillin",
+      "category": "safety",
+      "expected": [
+        "safety:synthetic-penicillin-amoxicillin:a:m"
+      ],
+      "predicted": [
+        "safety:synthetic-penicillin-amoxicillin:a:m",
+        "safety:allergy"
+      ],
+      "missing": [],
+      "extra": [
+        "safety:allergy"
+      ],
+      "metrics": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1,
+        "f1": 0.6666666666666666
+      },
+      "latencyMs": 4972
+    },
+    {
+      "id": "s4",
+      "name": "No recorded allergy does not infer safety",
+      "category": "safety",
+      "expected": [],
+      "predicted": [],
+      "missing": [],
+      "extra": [],
+      "metrics": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "latencyMs": 1856
+    }
+  ]
+}

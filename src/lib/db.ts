@@ -1,5 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync, mkdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
+import { migrateSQLite } from "./sqlite-migrations";
 import { dirname, resolve } from "node:path";
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import type { Note, Flag } from "./clinical";
@@ -33,14 +34,14 @@ export function database() {
   if (!db) {
     const path = resolve(
       /* turbopackIgnore: true */ process.env.DATABASE_PATH ||
-        "data/cliniscribe.sqlite",
+        "data/noticioner.sqlite",
     );
     mkdirSync(dirname(path), { recursive: true });
     db = new DatabaseSync(path);
     db.exec(
       "PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;",
     );
-    db.exec(readFileSync(resolve("migrations/001_initial.sql"), "utf8"));
+    migrateSQLite(db);
   }
   return db;
 }

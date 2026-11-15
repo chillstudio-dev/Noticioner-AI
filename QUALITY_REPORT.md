@@ -1,4 +1,6 @@
-# CliniScribe AI — judge readiness review
+# Noticioner AI — judge readiness review
+
+For the newer shared-practice implementation and its two subagent review rounds, see [PRACTICE_REVIEW.md](PRACTICE_REVIEW.md). The historical assessment below covers the original SQLite hackathon workspace.
 
 Review date: 14 November 2026 (Asia/Singapore).
 
@@ -35,3 +37,24 @@ Weighted score: 8.025/10, rounded to 8.0.
 ## Remaining limitations
 
 The main page remains large and would benefit from further component extraction. Speaker roles are contextual estimates, not voice identification. Clinical meaning, errors and review decisions need human inspection. Docker, other operating systems, independent accessibility assessment and public hosting are not verified. A clean clone can exercise the baseline without credentials; real AI requires the judge's own provider key. The author's key, local database, recordings, model binaries and build tools are excluded from Git.
+
+## Follow-up verification — 16 November 2026
+
+This addendum supersedes the earlier browser-test status above; the original review remains a historical snapshot. Follow-up checks used fictional data and local or mocked providers.
+
+- `npm run typecheck` and `npm run lint` pass.
+- With the temporary loopback PostgreSQL test database, `npm test` passes 98/98 with no skips. The bundled PostgreSQL runner remains blocked by this host's code-signing policy.
+- `npm run build -- --webpack` passes. The default Turbopack build remains blocked on this host by the native binding signature policy.
+- `npm run test:server` passes all 3 production HTTP workflow checks.
+- Playwright passes 18 tests, with 3 optional demo sign-in tests skipped. Shared-practice UI checks mock the API.
+- The `fictional-followup-2` personal-workspace HTTP evaluation processed all 12 fictional follow-ups. Every draft remained `Needs Review`; all 47 expected facts and source links matched with no quote, speaker, uncertainty, negation, correction, or SOAP-placement errors. This is an in-set result, not held-out or clinical accuracy evidence.
+- Trust Engine `trust-1.4.0` passed 24 deterministic fixtures with 15 TP, 0 FP, 0 FN. Independent code review led to additional duration and follow-up boundary tests; this authored set does not establish clinical generalization.
+- The bundled PostgreSQL runner remains blocked by the host's code-signing policy. To verify service integration, official PostgreSQL 18.7 source was checksum-verified and built on a temporary RAM disk; a fresh cluster bound only to `127.0.0.1:55432` passed `npm run test:practice` (10/10, 0 failed, 0 skipped), applying migrations 1–4. The test harness now permits an explicit loopback-only `PRACTICE_TEST_DATABASE_URL` fallback and rejects remote database URLs. This verifies the shared-practice service against PostgreSQL, while browser checks still mock its API. Quarantine restoration details and the exact metadata uncertainty are recorded in [TRUST_IMPLEMENTATION.md](TRUST_IMPLEMENTATION.md).
+- The production server is running at `http://127.0.0.1:3110` against a fresh temporary SQLite database. The routes `/`, `/practice`, and `/doctor` returned HTTP 200 after PostgreSQL test cleanup. Desktop and 390px mobile screenshots were inspected; text wraps and cards stack without visible overlap or clipping. The research-prototype banner uses the Noticioner name.
+
+## Recovery checkpoints
+
+- Pre-task tracked changes: `/tmp/noticioner-pre-task-tracked.patch`.
+- Pre-task untracked files: `/tmp/noticioner-pre-task-untracked.tar.gz`.
+- Task-only tracked changes relative to the pre-task baseline: `/tmp/noticioner-task-final-tracked.patch`.
+- New or changed untracked task artifacts relative to the pre-task baseline: `/tmp/noticioner-task-final-untracked-delta.tar.gz` (22 files, with a manifest).

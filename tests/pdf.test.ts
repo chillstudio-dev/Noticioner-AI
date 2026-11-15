@@ -31,9 +31,35 @@ const consultation: Consultation = {
 };
 test("PDF can export an empty draft with visible review disclosures", async () => {
   const bytes = await exportPDF(consultation, patient);
+  mkdirSync("test-results", { recursive: true });
+  writeFileSync("test-results/sample-consultation.pdf", bytes);
   const pdf = await PDFDocument.load(bytes);
   assert.equal(pdf.getPageCount(), 1);
   assert.match(pdf.getTitle()!, /Synthetic consultation/);
+});
+test("PDF embeds multilingual text without ASCII replacement", async () => {
+  const bytes = await exportPDF(
+    {
+      ...consultation,
+      note: {
+        statements: [
+          {
+            id: "multilingual",
+            section: "Subjective",
+            category: "other",
+            certainty: "Uncertain",
+            evidence: [],
+            text: "Français : douleur à la tête. Español: dolor de cabeza. Dansk: hovedpine.\n中文：头痛。日本語：頭が痛いです。한국어: 머리가 아파요.\nதமிழ்: தலை வலிக்கிறது. Bahasa Melayu: sakit kepala.",
+          },
+        ],
+      },
+    },
+    { ...patient, name: "Renée · தமிழ் · 中文 · 日本語 · 한국어" },
+  );
+  const pdf = await PDFDocument.load(bytes);
+  assert.ok(pdf.getPageCount() >= 1);
+  mkdirSync("test-results", { recursive: true });
+  writeFileSync("test-results/multilingual-consultation.pdf", bytes);
 });
 test("PDF paginates long statements and unbroken tokens", async () => {
   const c: Consultation = {

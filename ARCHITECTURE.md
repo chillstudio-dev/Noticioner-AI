@@ -1,5 +1,7 @@
 # Architecture
 
+This document describes the original SQLite workspace. The separate PostgreSQL shared-practice workspace is described in [HOSPITAL_DATA_ARCHITECTURE.md](HOSPITAL_DATA_ARCHITECTURE.md), with setup in [PRACTICE_SETUP.md](PRACTICE_SETUP.md) and verification in [PRACTICE_REVIEW.md](PRACTICE_REVIEW.md).
+
 Browser → Next.js route handlers → SQLite repository / provider adapter / PDF renderer.
 
 The client is a responsive React application. Shared recorder and dialog/badge components live in `src/components`; `src/lib/client-api.ts` handles bounded API requests and actionable response errors. Fontsource fonts are bundled locally. Protected data is never embedded in the public shell. Every data endpoint resolves a random, opaque, HttpOnly session cookie to a server-side user and applies ownership checks. Sessions expire after seven days. A new session starts empty; no fixture records are injected.
@@ -10,7 +12,7 @@ The client is a responsive React application. Shared recorder and dialog/badge c
 
 The provider adapter supports native Claude Messages structured output and OpenAI-compatible Chat Completions JSON mode. Schema constraints unsupported by Claude's structured output are removed from the request schema and retained in local Zod validation. Claude generation credentials are separate from optional OpenAI-compatible file transcription. Secrets never enter bootstrap responses. A configured provider indicates key presence, not verified connectivity.
 
-With `STT_PROVIDER=local`, `local-transcription.ts` runs FFmpeg and whisper.cpp through bounded, shell-free child processes. Each request uses a private temporary directory and removes it on success or failure. Child environments omit provider credentials. Conversion accepts a restricted set of audio containers and rejects silent or over-three-minute decoded audio before inference. A process-local guard allows one transcription at a time; cancellations and timeouts terminate the child process. The engine never silently falls back to a cloud API. Model and executable paths are server configuration, not request inputs.
+With `STT_PROVIDER=local`, `local-transcription.ts` runs FFmpeg and whisper.cpp through bounded, shell-free child processes. Each request uses a private temporary directory and removes it on success or failure. Child environments omit provider credentials. Conversion accepts a restricted set of audio containers and rejects silent or over-three-minute decoded audio before inference. A validated language code is passed to the multilingual Whisper model; English-only models reject non-English requests. A process-local guard allows one transcription at a time; cancellations and timeouts terminate the child process. The engine never silently falls back to a cloud API. Model and executable paths are server configuration, not request inputs.
 
 `evaluation-data.ts` stores reference labels separately from extraction. `evaluation.ts` runs a deterministic baseline or the configured AI provider on the same cases and computes measured metrics. The dashboard reads persisted actual outputs. The CLI writes versionable JSON artifacts.
 
