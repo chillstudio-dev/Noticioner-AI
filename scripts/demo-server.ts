@@ -113,7 +113,6 @@ async function shutdown() {
   identity?.closeAllConnections();
   if (identity?.listening)
     await new Promise<void>((resolve) => identity!.close(() => resolve()));
-  await app?.close().catch(() => {});
   if (pgStarted) await pg.stop().catch(() => {});
   if (nativePgStarted && nativePgCtl)
     await execFileAsync(
@@ -121,6 +120,7 @@ async function shutdown() {
       ["-D", postgresDir, "-m", "fast", "-w", "stop"],
       { timeout: 60000 },
     ).catch(() => {});
+  await app?.close().catch(() => {});
 }
 try {
   if (nativePgCtl && nativeInitdb) {
@@ -225,12 +225,14 @@ try {
   console.log(
     `Demo password: ${demoPassword}\nSimulated verification code: ${demoVerificationCode}\nSynthetic data only. Loopback-bound HTTP; this is not a real hospital identity provider or real MFA.\nPress Ctrl+C to stop.\n`,
   );
-  process.once("SIGINT", () => {
+  const stopOnSignal = () => {
+    // Terminal Ctrl-C and the parent launcher may signal us together. Let the
+    // first shutdown finish stopping PostgreSQL before exiting the process.
+    if (stopping) return;
     void shutdown().then(() => process.exit(0));
-  });
-  process.once("SIGTERM", () => {
-    void shutdown().then(() => process.exit(0));
-  });
+  };
+  process.on("SIGINT", stopOnSignal);
+  process.on("SIGTERM", stopOnSignal);
 } catch (error) {
   console.error(
     `Demo startup failed: ${error instanceof Error ? error.message : "unknown startup error"}`,
