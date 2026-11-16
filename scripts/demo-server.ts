@@ -1,6 +1,8 @@
 import { createServer, type Server } from "node:http";
 import { randomBytes } from "node:crypto";
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { access, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { once } from "node:events";
 import EmbeddedPostgres from "embedded-postgres";
@@ -12,6 +14,7 @@ import {
 } from "./demo-identity";
 
 const root = resolve("data/practice/demo");
+const execFileAsync = promisify(execFile);
 await mkdir(root, { recursive: true, mode: 0o700 });
 try {
   process.loadEnvFile(".env.local");
@@ -61,13 +64,43 @@ const pg = new EmbeddedPostgres({
   persistent: true,
   authMethod: "scram-sha-256",
   postgresFlags: ["-h", "127.0.0.1"],
-  onLog: () => {},
-  onError: () => {},
+  onLog: (message) => process.stderr.write(`[sample-postgres] ${message}`),
+  onError: (error) =>
+    console.error(
+      `[sample-postgres] ${error instanceof Error ? error.message : "PostgreSQL process error"}`,
+    ),
 });
+const nativePgBinDirs = [
+  process.env.NOTICIONER_POSTGRES_BIN_DIR,
+  "/opt/homebrew/opt/postgresql@18/bin",
+  "/usr/local/opt/postgresql@18/bin",
+].filter((value): value is string => !!value);
+let nativePgCtl: string | undefined;
+let nativeInitdb: string | undefined;
+for (const directory of nativePgBinDirs) {
+  try {
+    await Promise.all([
+      access(join(directory, "pg_ctl")),
+      access(join(directory, "initdb")),
+    ]);
+    nativePgCtl = join(directory, "pg_ctl");
+    nativeInitdb = join(directory, "initdb");
+    break;
+  } catch {}
+}
+let postgresDir = join(root, "postgres");
+if (nativePgCtl) {
+  const version = await readFile(join(postgresDir, "PG_VERSION"), "utf8").catch(
+    () => "",
+  );
+  if (!version.trim().startsWith("18"))
+    postgresDir = join(root, "postgres-homebrew-18");
+}
 let identity: Server | undefined, server: Server | undefined;
 let app: Awaited<ReturnType<(typeof import("next"))["default"]>> | undefined;
 let stopping = false;
 let pgStarted = false;
+let nativePgStarted = false;
 async function shutdown() {
   if (stopping) return;
   stopping = true;
@@ -82,17 +115,77 @@ async function shutdown() {
     await new Promise<void>((resolve) => identity!.close(() => resolve()));
   await app?.close().catch(() => {});
   if (pgStarted) await pg.stop().catch(() => {});
+  if (nativePgStarted && nativePgCtl)
+    await execFileAsync(
+      nativePgCtl,
+      ["-D", postgresDir, "-m", "fast", "-w", "stop"],
+      { timeout: 60000 },
+    ).catch(() => {});
 }
 try {
-  if (
-    !(await access(join(root, "postgres", "PG_VERSION")).then(
-      () => true,
-      () => false,
-    ))
-  )
-    await pg.initialise();
-  await pg.start();
-  pgStarted = true;
+  if (nativePgCtl && nativeInitdb) {
+    const versionFile = join(postgresDir, "PG_VERSION");
+    const version = await readFile(versionFile, "utf8").catch(() => "");
+    if (!version.trim()) {
+      const passwordFile = join(root, ".initdb-password");
+      await writeFile(passwordFile, `${state.databasePassword}\n`, {
+        mode: 0o600,
+      });
+      try {
+        await execFileAsync(
+          nativeInitdb,
+          [
+            "-D",
+            postgresDir,
+            "-U",
+            "practice_demo",
+            "--pwfile",
+            passwordFile,
+            "--auth-local=scram-sha-256",
+            "--auth-host=scram-sha-256",
+            "--encoding=UTF8",
+            "--locale=C",
+          ],
+          { timeout: 120000 },
+        );
+      } finally {
+        await unlink(passwordFile).catch(() => {});
+      }
+    }
+    const running = await execFileAsync(nativePgCtl, ["-D", postgresDir, "status"])
+      .then(() => true)
+      .catch(() => false);
+    if (!running) {
+      await execFileAsync(
+        nativePgCtl,
+        [
+          "-D",
+          postgresDir,
+          "-o",
+          "-p 55433 -h 127.0.0.1",
+          "-l",
+          join(root, "postgres.log"),
+          "-w",
+          "start",
+        ],
+        { timeout: 60000 },
+      );
+      nativePgStarted = true;
+    }
+    console.log("Sample PostgreSQL 18 is ready in the isolated demo data folder.");
+  } else {
+    if (
+      !(await access(join(postgresDir, "PG_VERSION")).then(
+        () => true,
+        () => false,
+      ))
+    )
+      await pg.initialise();
+    await pg.start();
+    pgStarted = true;
+    console.log("Sample PostgreSQL is ready in the isolated demo data folder.");
+  }
+  console.log("Applying migrations and seeding synthetic records.");
   const { migratePractice } = await import("./practice-migrate");
   const { closePracticePool } = await import("../src/lib/practice-store");
   await migratePractice();
@@ -140,7 +233,7 @@ try {
   });
 } catch (error) {
   console.error(
-    error instanceof Error ? error.message : "Demo startup failed.",
+    `Demo startup failed: ${error instanceof Error ? error.message : "unknown startup error"}`,
   );
   await shutdown();
   process.exitCode = 1;

@@ -2686,6 +2686,54 @@ summary:focus-visible {
 .mobile-nav-backdrop {
   display: none;
 }
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell > .sidebar > .brand,
+  .app-shell > .sidebar > .workspace-label,
+  .app-shell > .sidebar > .nav-label,
+  .app-shell > .sidebar nav > button,
+  .app-shell > .sidebar nav > .nav-subgroup-label,
+  .app-shell > .sidebar > a[href="/doctor"],
+  .app-shell > .sidebar > .sidebar-bottom {
+    animation: workspace-launch-item-in 360ms cubic-bezier(0.2, 0.75, 0.25, 1)
+      both;
+  }
+  .app-shell > .sidebar > .brand {
+    animation-delay: 20ms;
+  }
+  .app-shell > .sidebar > .workspace-label {
+    animation-delay: 90ms;
+  }
+  .app-shell > .sidebar > .nav-label {
+    animation-delay: 160ms;
+  }
+  .app-shell > .sidebar nav > button:nth-of-type(1) {
+    animation-delay: 220ms;
+  }
+  .app-shell > .sidebar nav > button:nth-of-type(2) {
+    animation-delay: 280ms;
+  }
+  .app-shell > .sidebar nav > button:nth-of-type(3) {
+    animation-delay: 340ms;
+  }
+  .app-shell > .sidebar nav > .nav-subgroup-label {
+    animation-delay: 390ms;
+  }
+  .app-shell > .sidebar nav > button:nth-of-type(4) {
+    animation-delay: 440ms;
+  }
+  .app-shell > .sidebar nav > button:nth-of-type(5) {
+    animation-delay: 500ms;
+  }
+  .app-shell > .sidebar nav > button:nth-of-type(6) {
+    animation-delay: 560ms;
+  }
+  .app-shell > .sidebar > a[href="/doctor"] {
+    animation-delay: 630ms;
+  }
+  .app-shell > .sidebar > .sidebar-bottom {
+    animation-delay: 700ms;
+  }
+}
 @keyframes clinical-panel-in {
   from {
     opacity: 0;
@@ -2694,6 +2742,16 @@ summary:focus-visible {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@keyframes workspace-launch-item-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 @keyframes clinical-notice-in {

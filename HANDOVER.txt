@@ -1,0 +1,41 @@
+NOTICIONER AI — PROJECT HANDOVER
+Updated: 15 November 2026
+
+PROJECT
+Noticioner AI is a synthetic clinical documentation and practice portal demo. It includes a personal workspace and doctor/practice portal. The practice demo uses local synthetic records; it is not connected to a real hospital identity provider or production patient database.
+
+WORK COMPLETED
+- Recovered the app dependency installation and restored the embedded PostgreSQL macOS package required by the local demo.
+- Fixed the development launch configuration to use the framework's normal bundler instead of forcing Webpack.
+- Deferred PDFKit loading until PDF export is requested to reduce unnecessary startup work.
+- Replaced heavyweight Recharts graphs with responsive inline SVG charts.
+- Switched the interface to the native system UI font stack and removed font downloads/imports.
+- Confirmed the production build and typecheck passed during the repair session. The / and /practice routes returned HTTP 200; unauthenticated protected API requests correctly returned HTTP 401.
+- Started the synthetic reviewer demo and confirmed a populated synthetic patient example was available.
+- Prepared a fresh demo database and kept the previous database as a recovery copy.
+
+RUNNING THE DEMO
+From the cliniscribe-ai directory run:
+
+  ./scripts/demo-start.sh
+
+Then open http://127.0.0.1:3109/doctor for the doctor portal or http://127.0.0.1:3109/practice for the practice workspace. The script builds when needed and starts the local demo services. App server: port 3109. Local identity: port 4111. Embedded PostgreSQL: port 55433. These services are intended for local loopback demo use.
+
+Demo reviewer account:
+  Email: reviewer@demo.local
+  Password: DemoDoctor!2026
+  Verification code: 123456
+
+These are demo-only credentials for the local synthetic environment.
+
+RECOVERY NOTES
+- Previous demo database: cliniscribe-ai/data/practice/demo.recovery-20261115
+- Original stalled dependency tree: cliniscribe-ai/node_modules/.stalled-original-20261115; active node_modules is the recovered installation.
+- A partial embedded PostgreSQL backup may exist at cliniscribe-ai/node_modules/@embedded-postgres/darwin-arm64.incomplete-20261115.
+- The original Documents/Nurse folder still exists. Its contents were copied to this external Nurse folder; the source has not been removed, so it can still be used as a recovery copy.
+
+VERIFICATION LIMITS
+The production build and typecheck were confirmed. The full unit test suite was not completed during the repair session. The doctor organization sign-in page reports that administrator setup is required because no real practice database or identity provider is configured. Use the local synthetic demo account above for a presentation.
+
+FOLDER CONTENTS
+This file is in the top-level Nurse folder beside cliniscribe-ai, github-upload, and latist.md.

@@ -31,7 +31,6 @@ import {
 } from "@/lib/db";
 import {
   parseTranscript,
-  baseline,
   noteSchema,
   validateEvidence,
   assertApproval,
@@ -359,8 +358,9 @@ async function handle(
         return response(consultation(user, c.id));
       }
       if (method === "POST" && action === "generate") {
-        const b = z
-          .object({ mode: z.enum(["baseline", "ai"]) })
+        z
+          .object({ mode: z.literal("ai") })
+          .strict()
           .parse(await req.json());
         const segments = parseTranscript(c.transcript);
         if (!segments.length)
@@ -368,17 +368,14 @@ async function handle(
         const contextPatient = patient(user, c.patient_id)!;
         const contextHash = patientContextHash(contextPatient);
         const start = Date.now(),
-          note =
-            b.mode === "ai"
-              ? await generateNote(segments, req.signal)
-              : baseline(segments);
+          note = await generateNote(segments, req.signal);
         const trust = await runTrustAudit(
           {
             note,
             sources: personalSources(segments, contextPatient, c.version),
             includeGaps: true,
           },
-          b.mode === "ai",
+          true,
           req.signal,
         );
         req.signal.throwIfAborted();
@@ -400,9 +397,7 @@ async function handle(
             note,
             combinedFlags(note, segments, trust),
             "Draft generated",
-            b.mode === "ai"
-              ? `AI / ${providerStatus().label} / ${providerStatus().model}`
-              : "Offline / keyword baseline",
+            `AI / ${providerStatus().label} / ${providerStatus().model}`,
             Date.now() - start,
           );
           database()

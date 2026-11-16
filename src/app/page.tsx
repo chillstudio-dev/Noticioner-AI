@@ -108,8 +108,7 @@ export default function App() {
   const [transcript, setTranscript] = useState(""),
     [editNote, setEditNote] = useState<Note | null>(null),
     [editing, setEditing] = useState(false),
-    [highlight, setHighlight] = useState<string | null>(null),
-    [mode, setMode] = useState<"baseline" | "ai">("baseline");
+    [highlight, setHighlight] = useState<string | null>(null);
   const [flag, setFlag] = useState<Flag | null>(null),
     [resolution, setResolution] = useState("Addressed"),
     [reviewNote, setReviewNote] = useState(""),
@@ -130,7 +129,6 @@ export default function App() {
   }, []);
   useEffect(() => {
     refresh()
-      .then((d) => setMode(d.provider.configured ? "ai" : "baseline"))
       .catch(() => {
         setMessageKind("error");
         setMessage(
@@ -503,7 +501,7 @@ export default function App() {
               />
               {data.provider.configured
                 ? `${data.provider.label} configured`
-                : "Offline baseline mode"}
+                : `${data.provider.label} not configured`}
             </span>
             <span className="top-divider" />
             <span className="avatar small-avatar">AM</span>
@@ -791,30 +789,18 @@ export default function App() {
                   <div className="panel-padding">
                     {selected.status !== "Approved" && (
                       <div className="generation">
-                        <label htmlFor="mode">Generation method</label>
-                        <select
-                          id="mode"
-                          value={mode}
-                          onChange={(e) =>
-                            setMode(e.target.value as "ai" | "baseline")
-                          }
-                        >
-                          <option
-                            value="ai"
-                            disabled={!data.provider.configured}
-                          >
-                            {data.provider.label}{" "}
-                            {data.provider.configured ? "" : "(not configured)"}
-                          </option>
-                          <option value="baseline">
-                            Offline keyword baseline (not AI)
-                          </option>
-                        </select>
+                        <strong>{data.provider.label} API</strong>
+                        <p className="small">
+                          {data.provider.configured
+                            ? "Draft generation uses the configured Claude API. The result stays a draft for clinician review."
+                            : "Configure the Claude API in the server environment before generating a draft."}
+                        </p>
                         <button
                           className="primary wide"
                           disabled={
                             busy ||
                             editing ||
+                            !data.provider.configured ||
                             !selected.transcript ||
                             transcript !== selected.transcript
                           }
@@ -825,14 +811,12 @@ export default function App() {
                                   await api<Consultation>(
                                     `consultations/${selected.id}/generate`,
                                     "POST",
-                                    { mode },
+                                    { mode: "ai" },
                                   ),
                                 );
                                 await refresh();
                               },
-                              mode === "ai"
-                                ? `Generating a draft with ${data.provider.label}…`
-                                : "Building the offline baseline draft…",
+                              `Generating a draft with ${data.provider.label}…`,
                             )
                           }
                         >
@@ -843,11 +827,6 @@ export default function App() {
                           )}
                           Generate draft
                         </button>
-                        <p className="small">
-                          {mode === "ai"
-                            ? "Uses the configured server-side AI provider."
-                            : "Rules-based fallback · not AI. Configure a provider in Settings for live generation."}
-                        </p>
                       </div>
                     )}
                     {selected.note ? (

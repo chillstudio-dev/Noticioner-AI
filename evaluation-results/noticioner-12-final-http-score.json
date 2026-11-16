@@ -1,37 +1,37 @@
 {
   "suite": "noticioner-fidelity-12",
   "suiteVersion": "fictional-followup-2",
-  "mode": "local-keyword-baseline-through-personal-workspace-api",
-  "createdAt": "2026-11-15T19:26:38.408Z",
+  "mode": "claude-api-through-personal-workspace-api",
+  "createdAt": "2026-11-15T21:18:43.575Z",
   "matchingRule": "Exact (case, cited transcript segment, extraction category) pairs; this does not assess semantic paraphrase quality or clinical correctness.",
   "overall": {
-    "tp": 47,
-    "fp": 0,
-    "fn": 0,
-    "precision": 1,
-    "recall": 1,
-    "f1": 1
+    "tp": 35,
+    "fp": 10,
+    "fn": 12,
+    "precision": 0.7777777777777778,
+    "recall": 0.7446808510638298,
+    "f1": 0.7608695652173912
   },
   "totals": {
     "supportedFacts": 47,
-    "capturedSupportedFacts": 47,
-    "omissions": 0,
-    "incorrectCategoryAssignments": 0,
-    "literalUnsupportedStatements": 0,
+    "capturedSupportedFacts": 35,
+    "omissions": 12,
+    "incorrectCategoryAssignments": 10,
+    "literalUnsupportedStatements": 41,
     "inventedForbiddenDetails": 0,
-    "sourceLinks": 47,
+    "sourceLinks": 45,
     "sourceLinkErrors": 0,
     "speakerErrors": 0,
-    "overconfidentUncertainFacts": 0,
+    "overconfidentUncertainFacts": 1,
     "negationSegments": 11,
-    "negationLosses": 0,
+    "negationLosses": 1,
     "numericSegments": 8,
     "numericLosses": 0,
     "numericSupersededSegments": 1,
     "correctionStatements": 1,
     "staleCorrectionFacts": 0,
-    "soapPlacements": 47,
-    "soapPlacementErrors": 0
+    "soapPlacements": 35,
+    "soapPlacementErrors": 1
   },
   "cases": [
     {
@@ -44,7 +44,7 @@
       "sourceLinks": 4,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 4,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
       "missing": [],
@@ -53,34 +53,41 @@
     {
       "id": "C02",
       "expectedFacts": 6,
-      "predictedFacts": 6,
-      "tp": 6,
-      "fp": 0,
-      "fn": 0,
-      "sourceLinks": 6,
+      "predictedFacts": 5,
+      "tp": 4,
+      "fp": 1,
+      "fn": 2,
+      "sourceLinks": 5,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 5,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
-      "missing": [],
-      "extra": []
+      "missing": [
+        "S01:duration",
+        "S04:history"
+      ],
+      "extra": [
+        "S04:followup"
+      ]
     },
     {
       "id": "C03",
       "expectedFacts": 2,
-      "predictedFacts": 2,
+      "predictedFacts": 3,
       "tp": 2,
-      "fp": 0,
+      "fp": 1,
       "fn": 0,
-      "sourceLinks": 2,
+      "sourceLinks": 3,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 3,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
       "missing": [],
-      "extra": []
+      "extra": [
+        "S01:complaint"
+      ]
     },
     {
       "id": "C04",
@@ -92,7 +99,7 @@
       "sourceLinks": 4,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 4,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
       "missing": [],
@@ -101,34 +108,45 @@
     {
       "id": "C05",
       "expectedFacts": 5,
-      "predictedFacts": 5,
-      "tp": 5,
-      "fp": 0,
-      "fn": 0,
-      "sourceLinks": 5,
+      "predictedFacts": 4,
+      "tp": 3,
+      "fp": 1,
+      "fn": 2,
+      "sourceLinks": 4,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 4,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
-      "missing": [],
-      "extra": []
+      "missing": [
+        "S01:other",
+        "S04:history"
+      ],
+      "extra": [
+        "S04:followup"
+      ]
     },
     {
       "id": "C06",
       "expectedFacts": 3,
       "predictedFacts": 3,
-      "tp": 3,
-      "fp": 0,
-      "fn": 0,
+      "tp": 1,
+      "fp": 2,
+      "fn": 2,
       "sourceLinks": 3,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 2,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
-      "missing": [],
-      "extra": []
+      "missing": [
+        "S01:history",
+        "S03:history"
+      ],
+      "extra": [
+        "S01:followup",
+        "S03:other"
+      ]
     },
     {
       "id": "C07",
@@ -140,7 +158,7 @@
       "sourceLinks": 4,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 4,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
       "missing": [],
@@ -150,17 +168,21 @@
       "id": "C08",
       "expectedFacts": 4,
       "predictedFacts": 4,
-      "tp": 4,
-      "fp": 0,
-      "fn": 0,
+      "tp": 3,
+      "fp": 1,
+      "fn": 1,
       "sourceLinks": 4,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 4,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
-      "missing": [],
-      "extra": []
+      "missing": [
+        "S04:history"
+      ],
+      "extra": [
+        "S04:followup"
+      ]
     },
     {
       "id": "C09",
@@ -172,59 +194,83 @@
       "sourceLinks": 4,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 4,
       "forbiddenMentions": 0,
-      "soapPlacementErrors": [],
+      "soapPlacementErrors": [
+        {
+          "sourceId": "S03",
+          "category": "medication",
+          "section": "Plan",
+          "expected": [
+            "Assessment"
+          ]
+        }
+      ],
       "missing": [],
       "extra": []
     },
     {
       "id": "C10",
       "expectedFacts": 4,
-      "predictedFacts": 4,
-      "tp": 4,
-      "fp": 0,
-      "fn": 0,
-      "sourceLinks": 4,
+      "predictedFacts": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 3,
+      "sourceLinks": 3,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 3,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
-      "missing": [],
-      "extra": []
+      "missing": [
+        "S02:complaint",
+        "S03:other",
+        "S04:history"
+      ],
+      "extra": [
+        "S02:allergy",
+        "S04:followup"
+      ]
     },
     {
       "id": "C11",
       "expectedFacts": 4,
       "predictedFacts": 4,
-      "tp": 4,
-      "fp": 0,
-      "fn": 0,
+      "tp": 3,
+      "fp": 1,
+      "fn": 1,
       "sourceLinks": 4,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
-      "unsupportedAdditions": 0,
+      "unsupportedAdditions": 4,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
-      "missing": [],
-      "extra": []
+      "missing": [
+        "S04:history"
+      ],
+      "extra": [
+        "S04:followup"
+      ]
     },
     {
       "id": "C12",
       "expectedFacts": 3,
       "predictedFacts": 3,
-      "tp": 3,
-      "fp": 0,
-      "fn": 0,
+      "tp": 2,
+      "fp": 1,
+      "fn": 1,
       "sourceLinks": 3,
       "sourceLinkErrors": 0,
       "speakerErrors": 0,
       "unsupportedAdditions": 0,
       "forbiddenMentions": 0,
       "soapPlacementErrors": [],
-      "missing": [],
-      "extra": []
+      "missing": [
+        "S01:history"
+      ],
+      "extra": [
+        "S01:complaint"
+      ]
     }
   ],
   "limits": [

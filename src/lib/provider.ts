@@ -76,7 +76,7 @@ export async function generateNote(segments: Segment[], signal?: AbortSignal): P
     throw new Error("AI provider must be openai or anthropic.");
   if (!status.configured)
     throw new Error(
-      `AI provider is not configured. Add ${status.provider === "anthropic" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY"} on the server, or select the offline baseline.`,
+      `AI provider is not configured. Add ${status.provider === "anthropic" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY"} on the server before generating a draft.`,
     );
   const anthropic = status.provider === "anthropic";
   const base = (
@@ -126,7 +126,7 @@ export async function generateNote(segments: Segment[], signal?: AbortSignal): P
   );
   if (!response.ok)
     throw new Error(
-      `AI provider request failed (${response.status}). Retry or use the labeled baseline.`,
+      `AI provider request failed (${response.status}). Retry when the provider is available.`,
     );
   const body = await response.json();
   if ((anthropic && body.stop_reason !== "end_turn") || (!anthropic && (body.choices?.[0]?.message?.refusal || (body.choices?.[0]?.finish_reason && body.choices[0].finish_reason !== "stop"))))

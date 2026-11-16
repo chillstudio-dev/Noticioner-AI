@@ -14,21 +14,23 @@ These descriptions match the current source and tests; they do not establish cli
 
 ## Verification performed — 16 November 2026
 
-All test data and transcripts used in this task are synthetic. The built server ran on loopback with a fresh SQLite file at `/tmp/noticioner-evaluation-runtime/workspace.sqlite`; evaluation and browser workflows used local baseline logic or mocked providers. No external provider calls were made.
+All test data and transcripts used in this task are synthetic. The built server ran on loopback with a fresh SQLite file at `/private/tmp/noticioner-evaluation-runtime/workspace.sqlite`. Verification included live Claude API requests from the eight-case extraction evaluation, the 12-case personal-workspace API evaluation, and one browser-generated consultation draft. Provider credentials were read from local configuration and were not included in the artifacts. Other browser tests use intercepted or mocked responses.
 
 | Command or check | Result |
 | --- | --- |
 | `npm run typecheck` | Passed (`tsc --noEmit`). |
 | `npm run lint` | Passed; one unused-variable warning was fixed and lint was rerun. |
-| `PRACTICE_DATABASE_URL=... npm test` | 98 passed, 0 failed, 0 skipped with the loopback PostgreSQL test database. |
+| `npm test` (rerun without PostgreSQL configured) | 94 passed, 0 failed, 4 PostgreSQL-only tests skipped. The PostgreSQL-enabled run was previously verified at 98 passed, 0 failed, 0 skipped. |
 | `npm run build -- --webpack` | Production build passed. Default `npm run build` fails on this host because the signed native Turbopack binding is blocked; Next falls back to WASM, which Turbopack cannot use. |
 | `npm run test:server` | 3/3 production HTTP tests passed: personal workflow, stale concurrent updates, and anonymous judge workspace. |
-| `TEST_BASE_URL=http://127.0.0.1:3110 npm run test:e2e -- --workers=1` | 18 passed, 3 skipped. The skips are optional demo identity sign-in tests. The shared-practice browser tests use mocked API responses; they are not live PostgreSQL integration evidence. |
+| `TEST_BROWSER_CHANNEL=chrome TEST_BASE_URL=http://127.0.0.1:3110 npm run test:e2e -- --workers=1` | 18 passed, 3 skipped. The skips are optional demo identity sign-in tests. The shared-practice browser tests use mocked API responses; they are not live PostgreSQL integration evidence. |
 | `PRACTICE_TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/postgres npm run test:practice` | Passed 10/10, 0 failed, 0 skipped against a fresh PostgreSQL 18.7 database. The suite applied all four numbered migrations and covered fresh and populated upgrades, shared practice workflow and authorization, Trust review, patient summaries, quality, staleness, and access revocation. The harness accepts only loopback PostgreSQL URLs for this fallback. |
 | `npm run evaluate:trust` | Current `trust-1.4.0`: 24/24 deterministic Trust fixtures completed, 0 errors; 15 TP, 0 FP, 0 FN. This measures the authored local rules only. |
+| `npm run evaluate -- --ai` | Live `claude-sonnet-5-5` run on eight synthetic cases: 24 TP, 1 FP, 1 FN; precision/recall/F1 96%; 8/8 structured outputs valid; 0 statements labeled Unsupported; mean latency 2.86 seconds. The run also writes the 24-case deterministic Trust result. |
 | `npm run evaluate:12-case` | Validated 12 cases, 44 segments and 47 exact gold facts; regenerated isolated transcript-only inputs and baseline/final results. |
+| `EVALUATION_BASE_URL=http://127.0.0.1:3110 node scripts/evaluate-12-case-http.mjs` plus `node scripts/score-12-case.mjs --run=evaluation-results/noticioner-12-final-http.json --output=evaluation-results/noticioner-12-final-http-score.json` | Live Claude through the personal API: 12/12 drafts returned and stayed `Needs Review`; 35/47 supported pairs, 10 category extras, 12 omissions (P 77.78%, R 74.47%, F1 76.09%); 45/45 exact source links, 0 quote or speaker mismatches, 1 uncertain fact marked Supported, 1 lost negation, 0 lost active numeric details, 0 stale corrected durations, 0 forbidden-detail matches, and 1 SOAP placement error. This is an author-written development-visible set, not held-out evidence. |
 | `node --import tsx scripts/evaluate-extraction-regression.ts` | Existing eight-case suite: precision 92%, recall 92%, F1 92%, 2 FP and 2 FN. |
-| 12-case personal API run (`fictional-followup-2`) | 12/12 drafts returned with `Needs Review`; 47/47 exact segment/category pairs, 47/47 source links, 0 quote or speaker mismatches, 0 uncertain claims promoted to Supported, 0 lost negations, 0 lost active numeric details, 0 stale corrected durations, and 0 SOAP placement errors. This is a tuned in-set match, not held-out evaluation. |
+| Earlier 12-case local-rule API run (`fictional-followup-2`) | 12/12 drafts returned with `Needs Review`; 47/47 exact segment/category pairs and 47/47 source links, with 0 quote or speaker mismatches, 0 uncertain claims promoted to Supported, 0 lost negations, 0 lost active numeric details, 0 stale corrected durations, and 0 SOAP placement errors. This tuned local-rule result is an in-set comparator, not held-out evaluation. |
 | Brand scan | Product UI copy uses Noticioner; the existing GitHub repository slug remains unchanged. |
 
 The 12-case JSON, transcript-only input, scorecards and per-case results are listed in [EVALUATION.md](EVALUATION.md).
@@ -40,7 +42,7 @@ The 12-case JSON, transcript-only input, scorecards and per-case results are lis
 - Independent Trust Engine reviews found duration and follow-up false positives and false negatives. The current rules distinguish unrelated dates and sleep length from symptom duration, accept numeric duration answers and dated care follow-ups, and distinguish nonclinical targets from provider, rehabilitation, imaging, and care-setting plans. Targeted regressions cover those examples; deterministic evaluation remains 24/24 on its authored fixture set.
 - An independent product review confirmed the clinician workflow and source navigation in the browser tests. Shared-practice browser checks mock the API; the separate PostgreSQL integration suite passed against the loopback fallback described above.
 
-No provider-backed calls were made during this verification run. The prior stored eight-case provider Trust result was not reproduced here.
+The eight-case provider-backed Trust suite was not rerun as part of this pass; the live provider calls above evaluate note generation. The earlier stored Trust result remains the only provider-backed Trust-suite result.
 
 ## Host verification notes
 

@@ -105,16 +105,23 @@ test("HTTP workflow persists, reviews, versions, approves and exports; security 
     });
     assert.equal(saved.status, 200);
     c = saved.data;
-    const generated = await req(
+    const localDraft = await req(
       cookie,
       `consultations/${c.id}/generate`,
       "POST",
       { mode: "baseline" },
     );
+    assert.equal(localDraft.status, 400);
+    const generated = await req(
+      cookie,
+      `consultations/${c.id}/generate`,
+      "POST",
+      { mode: "ai" },
+    );
     assert.equal(generated.status, 200, JSON.stringify(generated.data));
     c = generated.data;
     assert.ok(c.note.statements.length);
-    assert.equal(c.provider, "Offline / keyword baseline");
+    assert.match(c.provider, /^AI \/ Claude \/ /);
     assert.ok(
       c.note.statements.every((s) =>
         s.evidence.every((e) => transcript.includes(e.quote)),
@@ -176,7 +183,7 @@ test("HTTP workflow persists, reviews, versions, approves and exports; security 
     assert.equal(
       (
         await req(cookie, `consultations/${c.id}/generate`, "POST", {
-          mode: "baseline",
+          mode: "ai",
         })
       ).status,
       409,
@@ -217,7 +224,7 @@ test("HTTP workflow persists, reviews, versions, approves and exports; security 
     ).data;
     fresh = (
       await req(cookie, `consultations/${id}/generate`, "POST", {
-        mode: "baseline",
+        mode: "ai",
       })
     ).data;
     const invalidated = await req(cookie, `consultations/${id}`, "PATCH", {
@@ -272,7 +279,7 @@ test("concurrent reviews and competing edits reject stale versions, and approval
     ).data;
     c = (
       await req(cookie, `consultations/${c.id}/generate`, "POST", {
-        mode: "baseline",
+        mode: "ai",
       })
     ).data;
     assert.ok(c.flags.length >= 2);

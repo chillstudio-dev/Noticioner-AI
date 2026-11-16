@@ -124,8 +124,24 @@ test("personal generation rejects stale note/context and cancellation, retains s
     db.database()
       .prepare("UPDATE consultations SET transcript=? WHERE id=?")
       .run("Patient: Cough.", c.id);
+    let contextCalls = 0;
+    globalThis.fetch = async () => {
+      contextCalls++;
+      return response(
+        contextCalls === 1
+          ? note
+          : {
+              claims: note.statements.map((statement) => ({
+                statementId: statement.id,
+                status: "supported",
+                reason: "Synthetic test source matches the statement.",
+              })),
+              concerns: [],
+            },
+      );
+    };
     const generated = await (
-      await call(c.id, "generate", { mode: "baseline" })
+      await call(c.id, "generate", { mode: "ai" })
     ).json();
     db.database()
       .prepare("UPDATE consultations SET flags=? WHERE id=?")

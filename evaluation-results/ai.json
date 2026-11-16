@@ -1,22 +1,24 @@
 {
+  "suite": "extraction",
+  "suiteVersion": "extraction-1",
   "byCategory": [
     {
       "category": "complaint",
       "tp": 5,
-      "fp": 1,
+      "fp": 0,
       "fn": 0,
-      "precision": 0.8333333333333334,
+      "precision": 1,
       "recall": 1,
-      "f1": 0.9090909090909091
+      "f1": 1
     },
     {
       "category": "duration",
       "tp": 3,
-      "fp": 1,
+      "fp": 0,
       "fn": 0,
-      "precision": 0.75,
+      "precision": 1,
       "recall": 1,
-      "f1": 0.8571428571428571
+      "f1": 1
     },
     {
       "category": "followup",
@@ -71,21 +73,30 @@
       "precision": 1,
       "recall": 0.5,
       "f1": 0.6666666666666666
+    },
+    {
+      "category": "history",
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
     }
   ],
   "mode": "ai",
   "model": "claude-sonnet-5-5",
-  "createdAt": "2026-11-14T13:15:53.687Z",
+  "createdAt": "2026-11-15T21:16:34.050Z",
   "sampleSize": 8,
-  "precision": 0.9230769230769231,
+  "precision": 0.96,
   "recall": 0.96,
-  "f1": 0.9411764705882353,
-  "fp": 2,
+  "f1": 0.96,
+  "fp": 1,
   "fn": 1,
   "unsupportedRate": 0,
-  "evidenceAccuracy": 0.9230769230769231,
+  "evidenceAccuracy": 0.96,
   "validity": 1,
-  "latencyMs": 3022.3715939999993,
+  "latencyMs": 2860.5474999999997,
   "examples": [
     {
       "id": "e1",
@@ -123,7 +134,7 @@
       "statements": 3,
       "evidenceTotal": 3,
       "evidenceCorrect": 3,
-      "latencyMs": 2795.985083
+      "latencyMs": 3002.427417
     },
     {
       "id": "e2",
@@ -161,7 +172,7 @@
       "statements": 3,
       "evidenceTotal": 3,
       "evidenceCorrect": 3,
-      "latencyMs": 2665.0885409999996
+      "latencyMs": 2782.131
     },
     {
       "id": "e3",
@@ -199,7 +210,7 @@
       "statements": 3,
       "evidenceTotal": 3,
       "evidenceCorrect": 3,
-      "latencyMs": 2747.0257920000013
+      "latencyMs": 2783.4028340000004
     },
     {
       "id": "e4",
@@ -210,20 +221,17 @@
       ],
       "predicted": [
         "s3:complaint",
-        "s1:duration",
         "s2:duration"
       ],
       "missing": [],
-      "extra": [
-        "s1:duration"
-      ],
+      "extra": [],
       "facts": {
         "tp": 2,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "precision": 0.6666666666666666,
+        "precision": 1,
         "recall": 1,
-        "f1": 0.8
+        "f1": 1
       },
       "flags": {
         "tp": 4,
@@ -236,9 +244,9 @@
       "valid": true,
       "unsupported": 0,
       "statements": 2,
-      "evidenceTotal": 3,
+      "evidenceTotal": 2,
       "evidenceCorrect": 2,
-      "latencyMs": 2798.7550839999985
+      "latencyMs": 2539.256207999999
     },
     {
       "id": "e5",
@@ -249,7 +257,7 @@
         "s3:followup"
       ],
       "predicted": [
-        "s1:complaint",
+        "s1:history",
         "s2:assessment",
         "s3:followup"
       ],
@@ -257,7 +265,7 @@
         "s1:other"
       ],
       "extra": [
-        "s1:complaint"
+        "s1:history"
       ],
       "facts": {
         "tp": 2,
@@ -269,18 +277,18 @@
       },
       "flags": {
         "tp": 4,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "precision": 0.8,
+        "precision": 1,
         "recall": 1,
-        "f1": 0.888888888888889
+        "f1": 1
       },
       "valid": true,
       "unsupported": 0,
       "statements": 3,
       "evidenceTotal": 3,
       "evidenceCorrect": 2,
-      "latencyMs": 3142.9871669999993
+      "latencyMs": 2896.0944999999992
     },
     {
       "id": "e6",
@@ -320,7 +328,7 @@
       "statements": 4,
       "evidenceTotal": 4,
       "evidenceCorrect": 4,
-      "latencyMs": 3544.070708999998
+      "latencyMs": 3143.9363329999996
     },
     {
       "id": "e7",
@@ -360,7 +368,7 @@
       "statements": 4,
       "evidenceTotal": 4,
       "evidenceCorrect": 4,
-      "latencyMs": 3077.1879169999993
+      "latencyMs": 3002.8852499999994
     },
     {
       "id": "e8",
@@ -398,7 +406,7 @@
       "statements": 3,
       "evidenceTotal": 3,
       "evidenceCorrect": 3,
-      "latencyMs": 3407.8724589999983
+      "latencyMs": 2734.2464580000014
     }
   ]
 }

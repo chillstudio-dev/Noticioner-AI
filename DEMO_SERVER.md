@@ -13,6 +13,10 @@ npm run demo:server
 
 Alternatively, run `./scripts/demo-start.sh` from this checkout. It can use the Codex bundled Node runtime when Node is not on PATH, and builds the app if no production build exists. Rebuild after application changes. The runner reads `.env.local` for existing optional AI/audio settings, then overrides practice configuration inside its own process; it does not rewrite that file.
 
+On macOS, double-click **Start Noticioner.command** in the project root to start both the personal site (`127.0.0.1:3000`) and this doctor demonstration (`127.0.0.1:3109`), then open both pages automatically. The launcher reuses already-running Noticioner workspaces and leaves its Terminal window open so you can stop services with Control-C.
+
+The demo uses an isolated PostgreSQL cluster in `data/practice/demo/`. When Homebrew is available, the launcher ensures `postgresql@18` is installed and the demo uses its signed native binaries. This avoids macOS code-signing blocks on the bundled database binary. Without Homebrew, the demo falls back to `embedded-postgres`.
+
 Open **http://127.0.0.1:3109/doctor**. Click **Sign in with organization**, then use one of these deliberately public sample credentials:
 
 | Account | Name | Access to Alex's sample record |

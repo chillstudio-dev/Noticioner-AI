@@ -18,7 +18,7 @@ SQLite migrations apply only newer numbered files in individual rollback-safe tr
 
 ## Shared practice records
 
-To demonstrate doctor sign-in locally, run `./scripts/demo-start.sh` and open **http://127.0.0.1:3109/doctor**. This starts an isolated sample hospital, identity service and PostgreSQL database with synthetic records. Sample credentials and the walkthrough are in [DEMO_SERVER.md](DEMO_SERVER.md).
+To start both the personal site and the doctor login demonstration with one click on macOS, double-click **Start Noticioner.command** in the project folder. It opens the site at **http://127.0.0.1:3000** and the doctor portal at **http://127.0.0.1:3109/doctor**. Leave its Terminal window open while running. Alternatively, run `./scripts/demo-start.sh` to start only the isolated sample hospital. It uses its own identity service, PostgreSQL database and synthetic records. Sample credentials and the walkthrough are in [DEMO_SERVER.md](DEMO_SERVER.md).
 
 The `/doctor` portal provides organization sign-in and opens the shared `/practice` workspace. It reuses the organization OIDC account and requires provisioning; it does not create an anonymous doctor account. The separate `/practice` workspace adds PostgreSQL records, organization OIDC sign-in with an MFA assurance requirement, patient care assignments, shared documents, medication provenance, and reviewed AI summaries. Follow [PRACTICE_SETUP.md](PRACTICE_SETUP.md) for configuration and [HOSPITAL_DATA_ARCHITECTURE.md](HOSPITAL_DATA_ARCHITECTURE.md) for the implementation scope and rollout plan. Set `PRACTICE_ONLY=true` at build and runtime for a shared-only deployment. The anonymous behavior described below applies to the original synthetic SQLite workspace.
 
@@ -31,7 +31,7 @@ npm ci
 npm run dev
 ```
 
-Open **http://127.0.0.1:3000**. SQLite creates its schema automatically. No environment file is required to explore the workspace, use the labeled keyword baseline, review notes, run baseline evaluation or export PDFs.
+Open **http://127.0.0.1:3000**. SQLite creates its schema automatically. Configure the Claude API in the server environment to generate drafts. The reproducible keyword comparator is available only to the evaluation suite; it is not a drafting option.
 
 For the actual AI features, copy `.env.example` to `.env.local` and supply your own provider credential. Credentials are server-only and are deliberately excluded from Git. The repository cannot distribute the author's private API key.
 
@@ -48,7 +48,7 @@ Restart after changing configuration. OpenAI-compatible generation is also suppo
 1. Open Patients → Add synthetic patient. Enter a fictional name and date of birth.
 2. Open Overview → Start new consultation, choose the patient, and create the record.
 3. Paste a conversation or record and transcribe audio. Speaker labels are optional. Save the transcript.
-4. Choose the configured AI provider and Generate draft. Speaker badges distinguish explicit labels, inferred roles and unknown roles. The original text remains unchanged.
+4. Click Generate draft to send the saved transcript to the configured Claude API. Speaker badges distinguish explicit labels, inferred roles and unknown roles. The original text remains unchanged.
 5. Click a source reference. Compare the quote with the draft, edit if needed, and address review prompts.
 6. Review & approve explicitly, then Export PDF. Approved records become read-only.
 7. Open AI Evaluation to run the synthetic benchmark; Analytics reflects actual workspace activity.

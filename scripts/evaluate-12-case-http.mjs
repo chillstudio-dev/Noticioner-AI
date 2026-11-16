@@ -41,7 +41,7 @@ for (const sample of inputs.cases) {
     version: consultation.data.version,
   }, cookie);
   assert.equal(saved.data.transcript, transcript, `${sample.id}: transcript was not persisted verbatim`);
-  const generated = await call(`consultations/${consultation.data.id}/generate`, "POST", { mode: "baseline" }, cookie);
+  const generated = await call(`consultations/${consultation.data.id}/generate`, "POST", { mode: "ai" }, cookie);
   assert.ok(generated.data.note?.statements?.length, `${sample.id}: no draft statements returned`);
   assert.equal(generated.data.status, "Needs Review", `${sample.id}: generated draft should remain pending review`);
   examples.push({
@@ -57,7 +57,7 @@ for (const sample of inputs.cases) {
 const result = {
   suite: inputs.suite,
   suiteVersion: inputs.suite_version,
-  mode: "local-keyword-baseline-through-personal-workspace-api",
+  mode: "claude-api-through-personal-workspace-api",
   createdAt: new Date().toISOString(),
   sampleSize: examples.length,
   examples,

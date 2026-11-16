@@ -1,15 +1,15 @@
 {
   "suite": "trust",
   "suiteVersion": "synthetic-author-1",
-  "checkerVersion": "trust-1.0.0",
+  "checkerVersion": "trust-1.4.0",
   "mode": "deterministic",
-  "model": "trust-1.0.0",
+  "model": "trust-1.4.0",
   "provider": "local",
-  "createdAt": "2026-11-15T14:56:51.536Z",
+  "createdAt": "2026-11-15T21:16:34.077Z",
   "sampleSize": 24,
   "completed": 24,
   "errors": 0,
-  "latencyMs": 11,
+  "latencyMs": 24,
   "overall": {
     "tp": 15,
     "fp": 0,
@@ -77,7 +77,7 @@
         "recall": 1,
         "f1": 1
       },
-      "latencyMs": 9
+      "latencyMs": 14
     },
     {
       "id": "e2",
@@ -99,7 +99,7 @@
         "recall": 1,
         "f1": 1
       },
-      "latencyMs": 0
+      "latencyMs": 2
     },
     {
       "id": "e3",
@@ -159,7 +159,7 @@
         "recall": 0,
         "f1": 0
       },
-      "latencyMs": 0
+      "latencyMs": 1
     },
     {
       "id": "e6",
@@ -177,7 +177,7 @@
         "recall": 0,
         "f1": 0
       },
-      "latencyMs": 1
+      "latencyMs": 0
     },
     {
       "id": "g1",
@@ -199,7 +199,7 @@
         "recall": 1,
         "f1": 1
       },
-      "latencyMs": 0
+      "latencyMs": 2
     },
     {
       "id": "g2",
@@ -243,7 +243,7 @@
         "recall": 1,
         "f1": 1
       },
-      "latencyMs": 0
+      "latencyMs": 2
     },
     {
       "id": "g4",
@@ -323,7 +323,7 @@
         "recall": 1,
         "f1": 1
       },
-      "latencyMs": 0
+      "latencyMs": 1
     },
     {
       "id": "c2",
@@ -545,7 +545,7 @@
         "recall": 0,
         "f1": 0
       },
-      "latencyMs": 0
+      "latencyMs": 1
     }
   ]
 }

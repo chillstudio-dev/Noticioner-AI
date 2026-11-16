@@ -48,7 +48,7 @@ Run timestamp (UTC): 2026-11-14T08:13:34.720Z. Reproduce with `npm run evaluate`
 
 ## AI results
 
-Live Claude run (claude-sonnet-5-5) on 2026-11-14T13:15:53.687Z: precision 92.31%, recall 96.00%, F1 94.12%; 2 false positives and 1 false negative across eight synthetic examples. Full results: `evaluation-results/ai.json`. All eight outputs passed structured validation. This is one run on a development-visible set, not a claim of general superiority or clinical accuracy.
+Latest live Claude run (`claude-sonnet-5-5`) on 2026-11-15T21:16:34Z: 24 true positives, 1 false positive, and 1 false negative across eight synthetic examples (96.00% precision, recall, and F1). All eight outputs passed structured validation; unsupported rate was 0%, evidence accuracy was 96%, and mean latency was 2.86 seconds. The only category mismatch was the patient diagnostic guess in E5 (`other` expected, `history` predicted). Full results: [`evaluation-results/ai.json`](evaluation-results/ai.json). This is one run on a development-visible set, not a claim of general superiority or clinical accuracy.
 
 A separate live smoke check used one unlabeled nurse/patient paragraph. Claude assigned symptom/history statements to Patient and temperature/follow-up statements to Nurse; all were marked Inferred and required speaker review. This is not a speaker-attribution benchmark.
 
@@ -81,7 +81,7 @@ Reproduce local suites with `npm run evaluate`. Use `npm run evaluate -- --trust
 
 The separate suite `evaluation/noticioner-12-case-evaluation.json` contains **exactly 12** fictional primary-care follow-ups for people managing an ongoing condition. The suite covers straightforward symptoms/history, explicit negation, a correction, uncertain medication details, a patient diagnostic guess, a clinician observation, an aloud follow-up plan, an unknown speaker, and plausible details that were not stated. It has 44 ordered transcript segments and 47 gold facts. The gold JSON includes exact quotes, category, SOAP section, speaker, certainty, normalization, forbidden inferences and grounded review prompts.
 
-The model-input file `evaluation/transcript-inputs-12.json` contains only case IDs and transcript segments. The validator regenerates it from the gold artifact after checking the 12-case count, ordered segment IDs, complete scenario coverage, every exact quote, source speakers, required fields, prompt grounding and separation from the answer key. Run `npm run evaluate:12-case` to validate the files, compare a frozen copy of the original local keyword baseline with the current local baseline, and write both results. The final run was also exercised through the built personal-workspace HTTP API on a fresh SQLite database using only the transcript-input file. All 12 drafts remained `Needs Review`.
+The model-input file `evaluation/transcript-inputs-12.json` contains only case IDs and transcript segments. The validator regenerates it from the gold artifact after checking the 12-case count, ordered segment IDs, complete scenario coverage, every exact quote, source speakers, required fields, prompt grounding and separation from the answer key. Run `npm run evaluate:12-case` to validate the files, compare a frozen copy of the original local keyword baseline with the local-rule comparator, and write both results. A separate live Claude run went through the built personal-workspace HTTP API using only this transcript-input file; all 12 drafts remained `Needs Review`. The Claude-only UI/API path and the local comparator are distinct evaluation paths.
 
 ### Exact segment/category results
 
@@ -91,6 +91,11 @@ The match key is `(case ID, cited transcript segment ID, extraction category)`. 
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Frozen local keyword baseline v1 | 47 | 15 | 29 | 32 | 34.09% | 31.91% | 32.97% |
 | Final local rules through personal API | 47 | 47 | 0 | 0 | 100% | 100% | 100% |
+| Claude API through personal API (`claude-sonnet-5-5`) | 47 | 35 | 10 | 12 | 77.78% | 74.47% | 76.09% |
+
+The live Claude run completed at `2026-11-15T21:18:37Z`; raw output is [`evaluation-results/noticioner-12-final-http.json`](evaluation-results/noticioner-12-final-http.json) and the score is [`evaluation-results/noticioner-12-final-http-score.json`](evaluation-results/noticioner-12-final-http-score.json). It returned 45 statements with 45 exact source quotes, zero quote-link errors, and zero speaker mismatches. It had one overconfident capture of an uncertain fact, one lost negation across 11 negation-bearing segments, no lost active numeric details, no stale corrected duration, no forbidden-detail matches, and one SOAP placement error. All 12 notes remained pending clinician review.
+
+The scorer also flags a statement when its normalized claim text is not a literal substring of the cited transcript. It flagged 41 of 45 statement texts in this run. This is a strict lexical mismatch count, not a semantic determination that 41 claims are unsupported; paraphrases can trigger it. Exact quote links establish source-text existence, not whether the quote entails the generated claim. The separate overconfidence, negation, and SOAP checks above are rule-based checks against this author-written answer key.
 
 Separate integrity checks on the final API run found 47/47 source links resolving to an exact quote, 0 source-link errors, 0 speaker errors, 0 overconfident captures of facts labeled uncertain, 0 lost negations across 11 source segments, 0 lost numeric details across 8 active numeric segments, no stale corrected duration, and no SOAP section errors. One numeric segment was intentionally superseded by the explicit correction and is not counted as a loss. The baseline retained that superseded duration and produced two SOAP placement errors.
 

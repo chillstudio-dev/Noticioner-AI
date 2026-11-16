@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test("complete synthetic workflow, evidence, review, approval, PDF and reopen", async ({
+test("synthetic consultation exposes Claude as its only drafting method", async ({
   page,
 }) => {
   await page.goto("/");
@@ -26,51 +26,31 @@ test("complete synthetic workflow, evidence, review, approval, PDF and reopen", 
       "Patient: I have a sore throat.\nPatient: It started three days ago.\nDoctor: Follow-up: return tomorrow.",
     );
   await page.getByRole("button", { name: "Save transcript" }).click();
-  await page.getByLabel("Generation method").selectOption("baseline");
-  await page
-    .getByRole("button", { name: "Generate draft", exact: true })
-    .click();
-  await expect(page.getByRole("heading", { name: "SOAP draft" })).toBeVisible();
-  await page.getByRole("button", { name: "s1", exact: true }).first().click();
-  await expect(page.locator("#evidence-s1")).toHaveClass(/highlight/);
-  await page.getByRole("button", { name: "Edit note", exact: true }).click();
-  await page
-    .getByLabel("Edit Subjective statement")
-    .first()
-    .fill("Patient reports a sore throat.");
-  await page.getByRole("button", { name: "Save note edits" }).click();
-  await expect(
-    page.getByRole("button", { name: "Save note edits" }),
-  ).not.toBeVisible();
-  while (await page.locator("button.flag:not(.resolved)").count()) {
-    await page.locator("button.flag:not(.resolved)").first().click();
-    await page
-      .getByLabel("Reviewer note")
-      .fill(
-        "Reviewed against the synthetic source and acknowledged for demonstration.",
-      );
-    await page.getByRole("button", { name: "Save review action" }).click();
-    await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByText("Claude API", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Generation method")).toHaveCount(0);
+  await expect(page.getByText("Offline keyword baseline (not AI)")).toHaveCount(0);
+  const generate = page.getByRole("button", {
+    name: "Generate draft",
+    exact: true,
+  });
+  if (await generate.isEnabled()) {
+    let requestedMode: unknown;
+    await page.route("**/api/consultations/*/generate", async (route) => {
+      requestedMode = route.request().postDataJSON()?.mode;
+      await route.fulfill({
+        status: 422,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "Synthetic provider intercept." }),
+      });
+    });
+    await generate.click();
+    expect(requestedMode).toBe("ai");
+    await expect(page.getByRole("alert")).toContainText(
+      "Synthetic provider intercept.",
+    );
+  } else {
+    await expect(generate).toBeDisabled();
   }
-  await page.getByRole("button", { name: "Review & approve" }).click();
-  await page.getByRole("dialog").getByRole("checkbox").check();
-  await page
-    .getByRole("button", { name: "Confirm simulated approval" })
-    .click();
-  await expect(page.getByText("Approved", { exact: true })).toBeVisible();
-  const download = page.waitForEvent("download");
-  await page.getByRole("link", { name: "Export PDF" }).click();
-  const file = await download;
-  expect(file.suggestedFilename()).toMatch(/\.pdf$/);
-  await file.saveAs("test-results/approved-consultation.pdf");
-  await page.reload();
-  await page
-    .getByRole("button", { name: "Open consultation for Alex Bennett" })
-    .click();
-  await expect(page.getByText("Approved", { exact: true })).toBeVisible();
-  await expect(
-    page.getByText("Patient reports a sore throat.", { exact: true }),
-  ).toBeVisible();
 });
 test("API denies unauthenticated requests and cross-account reads, empty generation and premature approval", async ({
   request,
