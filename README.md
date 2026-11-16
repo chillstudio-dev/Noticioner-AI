@@ -2,9 +2,42 @@
 
 Clinician-reviewed documentation for fictional continuing-care visits. Record or paste a conversation, generate a source-linked SOAP draft, inspect Trust Engine findings, edit and review with a rationale, then approve. Diagnostic and prescribing decisions remain with the clinician. This synthetic prototype has no clinical validation or measured time-saving claim.
 
-**Submission write-up:** [WRITEUP.md](WRITEUP.md). **Current implementation and verification:** [TRUST_IMPLEMENTATION.md](TRUST_IMPLEMENTATION.md).
+**Current implementation and verification:** [TRUST_IMPLEMENTATION.md](TRUST_IMPLEMENTATION.md).
 
 The app opens directly: **no account, password, access code, or demo mode**. Each browser gets an isolated workspace behind the scenes. New workspaces are empty; add a fictional patient to begin. This is a research prototype using synthetic data, not a clinical product.
+
+## Judges: run the website on a Mac
+
+1. Install **Node.js 24.8 or newer** (with npm) from [nodejs.org](https://nodejs.org/). An internet connection is needed for the first setup.
+2. Download the **entire repository** using **Code → Download ZIP** on [Noticioner-AI](https://github.com/chillstudio-dev/Noticioner-AI), then unzip it. Keep all files together; downloading only the launcher will not work.
+3. Open the extracted folder and double-click **Start Noticioner.command**. If macOS blocks it, follow the steps below.
+4. Leave the Terminal window open. The launcher installs missing dependencies, builds the website, and starts both workspaces. If Homebrew is installed, it also installs PostgreSQL 18 when needed for the doctor demo. The first launch may take several minutes.
+5. When startup finishes, the browser opens the **personal website** at [http://127.0.0.1:3000](http://127.0.0.1:3000) and the **doctor portal** at [http://127.0.0.1:3109/doctor](http://127.0.0.1:3109/doctor). If tabs do not open, visit those addresses manually. Doctor demo sign-in details are in [DEMO_SERVER.md](DEMO_SERVER.md).
+
+Keep Terminal running while reviewing the website. Press **Control-C** in that window to stop it. To run it again, double-click the same launcher.
+
+### If macOS cannot verify the launcher
+
+macOS may say it cannot verify the developer or cannot check **Start Noticioner.command** for malicious software. This is a verification warning, not a virus-free certification. Only allow the launcher if you trust this repository and the downloaded file.
+
+1. Try opening **Start Noticioner.command** once, then dismiss the warning.
+2. Open **Apple menu → System Settings → Privacy & Security**.
+3. Scroll to the **Security** section and find the message about the blocked launcher.
+4. Click **Open Anyway**, authenticate if asked, and confirm **Open** in the next dialog. Try the launcher again if needed.
+
+If **Open Anyway** is missing, try opening the launcher again and return to Settings. On a managed Mac, your administrator may restrict this option. These steps apply to an unverified-developer warning; do not override a warning that explicitly reports malware or says the file will damage your computer. See [Apple’s official instructions](https://support.apple.com/en-us/102445).
+
+### AI features and starting data
+
+The interface runs without an AI key, but generating notes, translations, and patient summaries requires your own provider credentials. Before launching, copy **.env.example** to **.env.local** and fill in the provider settings described under [Run from this repository](#run-from-this-repository). Never commit your keys. Audio transcription also needs a configured provider or the [local audio setup](#optional-local-multilingual-audio--no-transcription-key).
+
+A fresh copy starts with an empty personal workspace: add a fictional patient to begin. The doctor launcher creates its own synthetic demo records. The author's saved local records and API keys are not included. Follow the [judge walkthrough](#judge-walkthrough) or [JUDGE_GUIDE.md](JUDGE_GUIDE.md) to try a consultation.
+
+If you prefer Terminal, open it in the extracted project folder and run:
+
+```sh
+npm run start:demo
+```
 
 ## Trust Engine and patient summaries
 
