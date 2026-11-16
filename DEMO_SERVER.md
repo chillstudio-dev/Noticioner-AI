@@ -4,6 +4,8 @@ This is a local-only sample server for showing doctor sign-in and shared patient
 
 ## Start and open
 
+To launch **both** workspaces on macOS, run `./start-demo.sh` or `npm run start:demo` from the project root. You can also double-click **Start Noticioner.command**. Use `NOTICIONER_OPEN_BROWSER=0 ./start-demo.sh` if you do not want browser tabs opened automatically. These entry points share the same setup, startup checks, and Control-C cleanup.
+
 With Node.js 24.8+ and dependencies installed:
 
 ```sh

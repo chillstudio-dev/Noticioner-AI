@@ -32,6 +32,12 @@ fi
 
 node_bin="${NOTICIONER_NODE:-}"
 if [[ -z "$node_bin" ]]; then node_bin="$(command -v node || true)"; fi
+if [[ -z "$node_bin" && -x /opt/homebrew/bin/node ]]; then
+  node_bin="/opt/homebrew/bin/node"
+fi
+if [[ -z "$node_bin" && -x /usr/local/bin/node ]]; then
+  node_bin="/usr/local/bin/node"
+fi
 if [[ -z "$node_bin" && -x "$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node" ]]; then
   node_bin="$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
 fi
@@ -39,6 +45,13 @@ if [[ -z "$node_bin" ]]; then
   echo "Install Node.js 24.8+ or set NOTICIONER_NODE to its executable path." >&2
   exit 1
 fi
+if ! "$node_bin" -e 'const [major, minor] = process.versions.node.split(".").map(Number); process.exit(major > 24 || (major === 24 && minor >= 8) ? 0 : 1)'; then
+  echo "Noticioner needs Node.js 24.8+. Set NOTICIONER_NODE to a supported executable." >&2
+  exit 1
+fi
+# Finder may omit Homebrew from PATH. npm and child scripts need the same Node.
+export PATH="$(dirname "$node_bin"):$PATH"
+export NOTICIONER_NODE="$node_bin"
 
 brew_bin="$(command -v brew || true)"
 if [[ -z "$brew_bin" && -x /opt/homebrew/bin/brew ]]; then
@@ -48,7 +61,8 @@ if [[ -z "$brew_bin" && -x /usr/local/bin/brew ]]; then
   brew_bin="/usr/local/bin/brew"
 fi
 if [[ -n "$brew_bin" ]]; then
-  if ! "$brew_bin" --prefix postgresql@18 >/dev/null 2>&1; then
+  postgres_prefix="$("$brew_bin" --prefix postgresql@18 2>/dev/null || true)"
+  if [[ ! -x "$postgres_prefix/bin/pg_ctl" || ! -x "$postgres_prefix/bin/initdb" ]]; then
     echo "Installing the signed PostgreSQL 18 runtime for the local doctor demo..."
     "$brew_bin" install postgresql@18
   fi
@@ -127,9 +141,12 @@ if [[ "$site_is_up" -ne 1 || "$doctor_is_up" -ne 1 ]]; then
   exit 1
 fi
 
-echo "Opening both workspaces..."
-open "$site_url"
-open "$doctor_url"
+echo "Both workspaces are ready."
+if [[ "${NOTICIONER_OPEN_BROWSER:-1}" != "0" ]]; then
+  echo "Opening browser tabs..."
+  open "$site_url"
+  open "$doctor_url"
+fi
 echo "Noticioner is at $site_url; doctor sign-in is at $doctor_url."
 echo "Sample accounts and the synthetic demo password/code are shown in DEMO_SERVER.md."
 echo "Leave this Terminal window open while services started by this launcher are in use. Press Control-C to stop them."

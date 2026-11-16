@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "start:demo": "./start-demo.sh",
     "dev": "next dev --disable-source-maps --hostname 127.0.0.1",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
